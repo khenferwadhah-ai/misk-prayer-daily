@@ -12,7 +12,7 @@ height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-background:url("Picsart_26-01-29-20-04-14-466.jpg") no-repeat center center fixed;
+background:url("background.jpg") no-repeat center center fixed;
 background-size:cover;
 }
 .overlay{
@@ -55,7 +55,7 @@ color:white;
 </div>
 
 <script>
-// قراءة المواقيت من ملف times.json
+// قراءة مواقيت الصلاة
 fetch("times.json")
   .then(r => r.json())
   .then(data => {
@@ -75,28 +75,38 @@ fetch("times.json")
       document.getElementById("gregorian").innerText = now.toLocaleDateString("ar-DZ",{
         weekday:"long", year:"numeric", month:"long", day:"numeric"
       });
-      document.getElementById("hijri").innerText = now.toLocaleDateString("ar-SA-u-ca-islamic",{
-        weekday:"long", year:"numeric", month:"long", day:"numeric"
-      });
 
-      let current = now.getHours()*60 + now.getMinutes();
+      // قراءة التاريخ الهجري من hijri.json
+      fetch("hijri.json")
+        .then(r => r.json())
+        .then(h => { document.getElementById("hijri").innerText = h.hijri; });
+
+      let currentMinutes = now.getHours()*60 + now.getMinutes();
       let next = null;
-      let diff = 0;
+      let diffMin = null;
 
       for(let p of prayers){
-        let [h,m] = p.time.split(":");
-        let t = Number(h)*60 + Number(m);
-        if(t > current){ next=p; diff=t-current; break; }
+        if(p.name === "الإمساك") continue; // تجاهل الإمساك في العدّ التنازلي
+        let [ph,pm] = p.time.split(":");
+        let total = parseInt(ph)*60 + parseInt(pm);
+        if(total > currentMinutes){
+          next = p;
+          diffMin = total - currentMinutes;
+          break;
+        }
       }
 
-      if(!next){
-        next=prayers[0];
-        diff=(24*60-current)+(Number(next.time.split(":")[0])*60+Number(next.time.split(":")[1]));
+      if(!next){ // إذا انتهت كل الصلوات، اختر أول صلاة بعد الإمساك
+        next = prayers.find(p => p.name !== "الإمساك") || prayers[0];
+        let [ph,pm] = next.time.split(":");
+        let total = parseInt(ph)*60 + parseInt(pm) + (24*60-currentMinutes);
+        diffMin = total;
       }
 
-      const hrs = Math.floor(diff/60);
-      const mins = diff%60;
-      document.getElementById("countdown").innerText = "الصلاة القادمة: "+next.name+" بعد "+hrs+"س "+mins+"د";
+      const hrs = Math.floor(diffMin/60);
+      const mins = diffMin % 60;
+      document.getElementById("countdown").innerText =
+        "الصلاة القادمة: "+next.name+" بعد "+hrs+"س "+mins+"د";
     }
 
     setInterval(updateCountdown,1000);
