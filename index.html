@@ -76,10 +76,9 @@ fetch("times.json")
         weekday:"long", year:"numeric", month:"long", day:"numeric"
       });
 
-      // قراءة التاريخ الهجري من hijri.json
-      fetch("hijri.json")
-        .then(r => r.json())
-        .then(h => { document.getElementById("hijri").innerText = h.hijri; });
+      // التاريخ الهجري التلقائي
+const hijriDate = now.toLocaleDateString('ar-SA-u-ca-islamic', {day:'numeric', month:'long', year:'numeric'});
+document.getElementById("hijri").innerText = hijriDate;
 
       let currentMinutes = now.getHours()*60 + now.getMinutes();
       let next = null;
