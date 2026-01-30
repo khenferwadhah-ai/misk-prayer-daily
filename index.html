@@ -25,8 +25,17 @@ text-align:center;
 color:white;
 }
 .logo{width:85px;margin-bottom:6px;}
-.title{font-size:18px;font-weight:bold;}
-.date{font-size:14px;margin:6px 0;color:#ffd700;}
+/* العنوان والتاريخ الميلادي والهجري بخط ثلاثي الأبعاد ومضيء */
+.title, .date{
+  font-family:'Amiri', serif; /* بديل خط سلطان */
+  color:#bfff00; /* نفس لون الساعة */
+  font-weight:bold;
+  text-shadow: 
+    2px 2px 4px #006600,  /* ظل أسود خفيف لعمق */
+    0 0 8px #bfff00,       /* توهج خارجي */
+    0 0 15px #80ff00;      /* توهج أوسع */
+  margin:6px 0;
+}
 .clock{
   font-size:48px;
   font-weight:bold;
