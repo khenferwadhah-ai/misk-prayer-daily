@@ -1,196 +1,119 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لوحة مواقيت الصلاة</title>
-
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Tahoma',Arial;}
-body{
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-background:url("background.jpg") no-repeat center center fixed;
-background-size:cover;
-}
-.overlay{
-width:95%;
-max-width:420px;
-background:rgba(0,0,0,0.72);
-border-radius:18px;
-padding:15px;
-text-align:center;
-color:white;
-}
-.logo{width:85px;margin-bottom:6px;}
-/* العنوان والتاريخ الميلادي والهجري بخط ثلاثي الأبعاد ومضيء */
-.title, .date{
-  font-family:'Amiri', serif; /* بديل خط سلطان */
-  color:#bfff00; /* نفس لون الساعة */
-  font-weight:bold;
-  text-shadow: 
-    2px 2px 4px #006600,  /* ظل أسود خفيف لعمق */
-    0 0 8px #bfff00,       /* توهج خارجي */
-    0 0 15px #80ff00;      /* توهج أوسع */
-  margin:6px 0;
-}
-.clock{
-  font-size:48px;
-  font-weight:bold;
-  margin:10px 0;
-  padding:10px 20px;
-  border-radius:12px;
-  background:rgba(0,255,0,0.15); /* إطار زجاجي أخضر شفاف */
-  border:2px solid rgba(0,255,0,0.4);
-  box-shadow: 0 0 20px rgba(0,255,0,0.6), 0 0 40px rgba(0,255,0,0.3) inset;
-  color:#bfff00; /* لون الأرقام مضيء */
-  text-shadow: 0 0 8px #bfff00, 0 0 15px #80ff00;
-}
-.next{font-size:16px;margin:8px 0;color:#00ffd5;}
-.table{width:100%;font-size:17px;}
-.row{display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.25);padding:6px 0;}
-</style>
-</head>
-
-<body>
-
-<div class="overlay">
-
-<img src="1767208919520" class="logo">
-
-<div class="title">الجمعية الخيرية مسك الختام – الڨرارم ڨوڨة</div>
-
-<div class="date" id="gregorian">--</div>
-<div class="date" id="hijri">--</div>
-
-<div class="clock" id="clock">00:00:00</div>
-<div class="next" id="countdown">--</div>
-
-<div class="table" id="prayerTable">
-<!-- جدول المواقيت سيتم ملؤه من times.json -->
-</div>
-
-</div>
-
 <script>
-// قراءة مواقيت الصلاة
 fetch("times.json")
   .then(r => r.json())
   .then(data => {
-    const prayers = data.prayers;
+
+    let prayers = data.prayers;
     const container = document.getElementById("prayerTable");
 
-    prayers.forEach(p => {
-      const div = document.createElement("div");
-      div.className = "row";
-      div.innerHTML = `<span>${p.name}</span><span>${p.time}</span>`;
-      container.appendChild(div);
-    });
+    function buildTable(){
+      container.innerHTML = "";
 
-    function updateCountdown(){
+      prayers.forEach(p => {
+        const row = document.createElement("div");
+        row.className = "row prayer-row";
+        row.dataset.name = p.name;
+        row.dataset.time = p.time;
+        row.innerHTML = `<span>${p.name}</span><span>${p.time}</span>`;
+        container.appendChild(row);
+      });
+    }
+
+    function calculateImsak(fajr){
+      const [h,m] = fajr.split(":").map(Number);
+      const d = new Date();
+      d.setHours(h, m - 10, 0, 0);
+      return String(d.getHours()).padStart(2,"0") + ":" +
+             String(d.getMinutes()).padStart(2,"0");
+    }
+
+    function apply31Jan2026(){
       const now = new Date();
-      document.getElementById("clock").innerText = now.toLocaleTimeString("ar-DZ");
-      document.getElementById("gregorian").innerText = now.toLocaleDateString("ar-DZ",{
-        weekday:"long", year:"numeric", month:"long", day:"numeric"
+      const today =
+        now.getFullYear()+"-"+
+        String(now.getMonth()+1).padStart(2,"0")+"-"+
+        String(now.getDate()).padStart(2,"0");
+
+      if(today === "2026-01-31"){
+
+        const fajrTime = "06:10";
+
+        prayers = [
+          {name:"الإمساك", time: calculateImsak(fajrTime)},
+          {name:"الفجر", time: fajrTime},
+          {name:"الظهر", time:"12:50"},
+          {name:"العصر", time:"15:37"},
+          {name:"المغرب", time:"18:03"},
+          {name:"العشاء", time:"19:23"}
+        ];
+
+        buildTable();
+      }
+    }
+
+    function updateClock(){
+
+      const now = new Date();
+
+      document.getElementById("clock").innerText =
+        now.toLocaleTimeString("ar-DZ",{hour12:false});
+
+      document.getElementById("gregorian").innerText =
+        now.toLocaleDateString("ar-DZ",{
+          weekday:"long", year:"numeric", month:"long", day:"numeric"
+        });
+
+      const cutoff = new Date("2026-02-01T00:00:00");
+      document.getElementById("hijri").innerText =
+        now < cutoff
+        ? "12 شعبان 1447"
+        : now.toLocaleDateString("ar-SA-u-ca-islamic",
+          {day:"numeric",month:"long",year:"numeric"});
+
+      const currentMinutes = now.getHours()*60 + now.getMinutes();
+
+      let next = null;
+      let diff = null;
+
+      document.querySelectorAll(".prayer-row").forEach(r=>{
+        r.classList.remove("next-prayer");
       });
 
-      // التاريخ الهجري المثبت حتى 01 فيفري 2026 الساعة 00:00
-const cutoff = new Date("2026-02-01T00:00:00"); // تاريخ الحد
-let hijriDate;
-
-if(now < cutoff){
-    hijriDate = "12 شعبان 1447"; // التاريخ المثبت
-}else{
-    hijriDate = now.toLocaleDateString('ar-SA-u-ca-islamic', {day:'numeric', month:'long', year:'numeric'});
-}
-
-document.getElementById("hijri").innerText = hijriDate;
-
-      let currentMinutes = now.getHours()*60 + now.getMinutes();
-      let next = null;
-      let diffMin = null;
-
       for(let p of prayers){
-        if(p.name === "الإمساك") continue; // تجاهل الإمساك في العدّ التنازلي
-        let [ph,pm] = p.time.split(":");
-        let total = parseInt(ph)*60 + parseInt(pm);
+        if(p.name === "الإمساك") continue;
+
+        const [h,m] = p.time.split(":").map(Number);
+        const total = h*60 + m;
+
         if(total > currentMinutes){
           next = p;
-          diffMin = total - currentMinutes;
+          diff = total - currentMinutes;
           break;
         }
       }
 
-      if(!next){ // إذا انتهت كل الصلوات، اختر أول صلاة بعد الإمساك
-        next = prayers.find(p => p.name !== "الإمساك") || prayers[0];
-        let [ph,pm] = next.time.split(":");
-        let total = parseInt(ph)*60 + parseInt(pm) + (24*60-currentMinutes);
-        diffMin = total;
+      if(!next){
+        next = prayers.find(p=>p.name!=="الإمساك");
+        const [h,m] = next.time.split(":").map(Number);
+        diff = (24*60 - currentMinutes) + (h*60+m);
       }
 
-      const hrs = Math.floor(diffMin/60);
-      const mins = diffMin % 60;
+      const hrs = Math.floor(diff/60);
+      const mins = diff % 60;
+
       document.getElementById("countdown").innerText =
-        "الصلاة القادمة: "+next.name+" بعد "+hrs+"س "+mins+"د";
+        `الصلاة القادمة: ${next.name} بعد ${hrs}س ${mins}د`;
+
+      document.querySelectorAll(".prayer-row").forEach(r=>{
+        if(r.dataset.name === next.name){
+          r.classList.add("next-prayer");
+        }
+      });
     }
 
-    setInterval(updateCountdown,1000);
-    updateCountdown();
-  })
-  .catch(err=>console.error("خطأ في تحميل مواقيت الصلاة:", err));
+    buildTable();
+    apply31Jan2026();
+    setInterval(updateClock,1000);
+    updateClock();
+  });
 </script>
-<script>
-
-   // كودك القديم كله
-   // لا تحذف منه أي سطر
-
-   /* ===============================
-      مواقيت يوم 31 / 01 / 2026
-      =============================== */
-
-   const tomorrowDate = "2026-01-31";
-
-   const prayerTimes_31_01_2026 = {
-     fajr: "06:10",
-     dhuhr: "12:49",
-     asr: "15:39",
-     maghrib: "18:03",
-     isha: "19:24"
-   };
-
-   function calculateImsak(fajrTime){
-     const [h, m] = fajrTime.split(":").map(Number);
-     const date = new Date();
-     date.setHours(h, m - 10, 0, 0);
-     return String(date.getHours()).padStart(2,"0") + ":" +
-            String(date.getMinutes()).padStart(2,"0");
-   }
-
-   function applyTomorrowTimes(){
-     const now = new Date();
-     const today =
-       now.getFullYear() + "-" +
-       String(now.getMonth()+1).padStart(2,"0") + "-" +
-       String(now.getDate()).padStart(2,"0");
-
-     if(today === tomorrowDate){
-
-       document.getElementById("imsak").innerText =
-         calculateImsak(prayerTimes_31_01_2026.fajr);
-
-       document.getElementById("fajr").innerText    = prayerTimes_31_01_2026.fajr;
-       document.getElementById("dhuhr").innerText   = prayerTimes_31_01_2026.dhuhr;
-       document.getElementById("asr").innerText     = prayerTimes_31_01_2026.asr;
-       document.getElementById("maghrib").innerText = prayerTimes_31_01_2026.maghrib;
-       document.getElementById("isha").innerText    = prayerTimes_31_01_2026.isha;
-     }
-   }
-
-   setInterval(applyTomorrowTimes, 60000);
-   applyTomorrowTimes();
-
-</script>
-</body>
-</html>
