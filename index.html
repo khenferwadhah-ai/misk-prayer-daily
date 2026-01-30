@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة مواقيت الصلاة</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Tahoma',Arial;}
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:url("background.jpg") no-repeat center center fixed;
+background-size:cover;
+}
+.overlay{
+width:95%;
+max-width:420px;
+background:rgba(0,0,0,0.72);
+border-radius:18px;
+padding:15px;
+text-align:center;
+color:white;
+}
+.logo{width:85px;margin-bottom:6px;}
+.title{font-size:18px;font-weight:bold;}
+.date{font-size:14px;margin:6px 0;color:#ffd700;}
+.clock{font-size:38px;font-weight:bold;margin:6px 0;}
+.next{font-size:16px;margin:8px 0;color:#00ffd5;}
+.table{width:100%;font-size:17px;}
+.row{display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.25);padding:6px 0;}
+</style>
+</head>
+
+<body>
+
+<div class="overlay">
+
+<img src="logo.png" class="logo">
+
+<div class="title">الجمعية الخيرية مسك الختام – الڨرارم ڨوڨة</div>
+
+<div class="date" id="gregorian">--</div>
+<div class="date" id="hijri">--</div>
+
+<div class="clock" id="clock">00:00:00</div>
+<div class="next" id="countdown">--</div>
+
+<div class="table" id="prayerTable">
+<!-- جدول المواقيت سيتم ملؤه من times.json -->
+</div>
+
+</div>
+
+<script>
+// قراءة المواقيت من ملف times.json
+fetch("times.json")
+  .then(r => r.json())
+  .then(data => {
+    const prayers = data.prayers;
+    const container = document.getElementById("prayerTable");
+
+    prayers.forEach(p => {
+      const div = document.createElement("div");
+      div.className = "row";
+      div.innerHTML = `<span>${p.name}</span><span>${p.time}</span>`;
+      container.appendChild(div);
+    });
+
+    function updateCountdown(){
+      const now = new Date();
+      document.getElementById("clock").innerText = now.toLocaleTimeString("ar-DZ");
+      document.getElementById("gregorian").innerText = now.toLocaleDateString("ar-DZ",{
+        weekday:"long", year:"numeric", month:"long", day:"numeric"
+      });
+      document.getElementById("hijri").innerText = now.toLocaleDateString("ar-SA-u-ca-islamic",{
+        weekday:"long", year:"numeric", month:"long", day:"numeric"
+      });
+
+      let current = now.getHours()*60 + now.getMinutes();
+      let next = null;
+      let diff = 0;
+
+      for(let p of prayers){
+        let [h,m] = p.time.split(":");
+        let t = Number(h)*60 + Number(m);
+        if(t > current){ next=p; diff=t-current; break; }
+      }
+
+      if(!next){
+        next=prayers[0];
+        diff=(24*60-current)+(Number(next.time.split(":")[0])*60+Number(next.time.split(":")[1]));
+      }
+
+      const hrs = Math.floor(diff/60);
+      const mins = diff%60;
+      document.getElementById("countdown").innerText = "الصلاة القادمة: "+next.name+" بعد "+hrs+"س "+mins+"د";
+    }
+
+    setInterval(updateCountdown,1000);
+    updateCountdown();
+  })
+  .catch(err=>console.error("خطأ في تحميل مواقيت الصلاة:", err));
+</script>
+
+</body>
+</html>
