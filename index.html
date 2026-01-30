@@ -76,8 +76,16 @@ fetch("times.json")
         weekday:"long", year:"numeric", month:"long", day:"numeric"
       });
 
-      // التاريخ الهجري التلقائي
-const hijriDate = now.toLocaleDateString('ar-SA-u-ca-islamic', {day:'numeric', month:'long', year:'numeric'});
+      // التاريخ الهجري المثبت حتى 01 فيفري 2026 الساعة 00:00
+const cutoff = new Date("2026-02-01T00:00:00"); // تاريخ الحد
+let hijriDate;
+
+if(now < cutoff){
+    hijriDate = "12 شعبان 1447"; // التاريخ المثبت
+}else{
+    hijriDate = now.toLocaleDateString('ar-SA-u-ca-islamic', {day:'numeric', month:'long', year:'numeric'});
+}
+
 document.getElementById("hijri").innerText = hijriDate;
 
       let currentMinutes = now.getHours()*60 + now.getMinutes();
