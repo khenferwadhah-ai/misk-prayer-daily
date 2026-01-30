@@ -141,6 +141,56 @@ document.getElementById("hijri").innerText = hijriDate;
   })
   .catch(err=>console.error("خطأ في تحميل مواقيت الصلاة:", err));
 </script>
+<script>
 
+   // كودك القديم كله
+   // لا تحذف منه أي سطر
+
+   /* ===============================
+      مواقيت يوم 31 / 01 / 2026
+      =============================== */
+
+   const tomorrowDate = "2026-01-31";
+
+   const prayerTimes_31_01_2026 = {
+     fajr: "06:10",
+     dhuhr: "12:49",
+     asr: "15:39",
+     maghrib: "18:03",
+     isha: "19:24"
+   };
+
+   function calculateImsak(fajrTime){
+     const [h, m] = fajrTime.split(":").map(Number);
+     const date = new Date();
+     date.setHours(h, m - 10, 0, 0);
+     return String(date.getHours()).padStart(2,"0") + ":" +
+            String(date.getMinutes()).padStart(2,"0");
+   }
+
+   function applyTomorrowTimes(){
+     const now = new Date();
+     const today =
+       now.getFullYear() + "-" +
+       String(now.getMonth()+1).padStart(2,"0") + "-" +
+       String(now.getDate()).padStart(2,"0");
+
+     if(today === tomorrowDate){
+
+       document.getElementById("imsak").innerText =
+         calculateImsak(prayerTimes_31_01_2026.fajr);
+
+       document.getElementById("fajr").innerText    = prayerTimes_31_01_2026.fajr;
+       document.getElementById("dhuhr").innerText   = prayerTimes_31_01_2026.dhuhr;
+       document.getElementById("asr").innerText     = prayerTimes_31_01_2026.asr;
+       document.getElementById("maghrib").innerText = prayerTimes_31_01_2026.maghrib;
+       document.getElementById("isha").innerText    = prayerTimes_31_01_2026.isha;
+     }
+   }
+
+   setInterval(applyTomorrowTimes, 60000);
+   applyTomorrowTimes();
+
+</script>
 </body>
 </html>
