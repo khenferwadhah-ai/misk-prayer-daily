@@ -117,7 +117,33 @@ document.getElementById("hijri").innerText = hijriDate;
     setInterval(updateCountdown,1000);  
     updateCountdown();  
   })  
-  .catch(err=>console.error("خطأ في تحميل مواقيت الصلاة:", err));  
+  .catch(err=>console.error("خطأ في تحميل مواقيت الصلاة:", err));  function colorNextPrayerOnly(){
+
+  const rows = document.querySelectorAll(".row");
+  const now = new Date();
+  const currentMinutes = now.getHours()*60 + now.getMinutes();
+
+  rows.forEach(r => r.classList.remove("next-prayer"));
+
+  for(let row of rows){
+
+    const name = row.children[0].innerText.trim();
+    const time = row.children[1].innerText.trim();
+
+    if(name === "الإمساك") continue; // تجاهل الإمساك
+
+    const [h,m] = time.split(":").map(Number);
+    const total = h*60 + m;
+
+    if(total > currentMinutes){
+      row.classList.add("next-prayer");
+      break;
+    }
+  }
+}
+
+setInterval(colorNextPrayerOnly, 30000);
+colorNextPrayerOnly();
 </script>  <script>  
   
    // كودك القديم كله  
