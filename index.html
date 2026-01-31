@@ -3,13 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لوحة مواقيت الصلاة</title>.next-prayer {
-  border: 2px solid rgba(0, 255, 0, 0.6); /* إطار أخضر خفيف */
-  border-radius: 6px;
-  padding: 4px 8px;
-  background: rgba(0, 255, 0, 0.08); /* خلفية شفافة خضراء */
-  transition: all 0.3s ease; /* حركة سلسة عند تغييره */
-}
+<title>لوحة مواقيت الصلاة</title>
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Tahoma',Arial;}
 body{
@@ -31,13 +26,13 @@ body{
 }
 .logo{width:85px;margin-bottom:6px;}
 
-/* العنوان بخط أبيض جميل */
+/* العنوان بخط أبيض kaf gulzar BOLD */
 .title {
-  font-family: "mohammad bold art", sans-serif; /* خط أبيض */
+  font-family: "mohammad bold art", sans-serif;
   color: #ffffff;
   font-weight: bold;
   text-shadow: 2px 2px 4px #000000, 0 0 6px #ffffff, 0 0 12px #ffffff;
-  margin: 6px 0;
+  margin:6px 0;
 }
 
 /* الساعة الحالية */
@@ -58,7 +53,7 @@ body{
 .table{width:100%;font-size:17px;margin-top:10px;}
 .row{display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.25);padding:6px 0;}
 
-/* العد التنازلي للصلاة القادمة */
+/* العد التنازلي للساعة القادمة */
 #nextPrayerClock{
   font-size:32px;
   margin-top:8px;
@@ -81,117 +76,130 @@ body{
 </style>
 </head>
 <body>
+
 <div class="overlay">
-  <img src="logo.png" class="logo">
-  <div class="title">الجمعية الخيرية مسك الختام – القرارم قوقة</div>
 
-  <div class="date" id="gregorian">--</div>
-  <div class="date" id="hijri">--</div>
+<img src="logo.png" class="logo">
 
-  <div class="clock" id="clock">00:00:00</div>
+<div class="title">الجمعية الخيرية مسك الختام – القرارم قوقة</div>
 
-  <div class="next" id="countdownText">الصلاة القادمة: --</div>
-  <div class="clock" id="nextPrayerClock">--:--:--</div>
+<div class="date" id="gregorian">--</div>
+<div class="date" id="hijri">--</div>
 
-  <div class="table" id="prayerTable"></div>
+<div class="clock" id="clock">00:00:00</div>
+
+<div class="next" id="countdownText">الصلاة القادمة: --</div>
+<div class="clock" id="nextPrayerClock">--:--:--</div>
+
+<div class="table" id="prayerTable">
+  <!-- جدول المواقيت سيتم ملؤه من times.json -->
+</div>
+
 </div>
 
 <script>
-// مواقيت الصلاة ثابتة
-const prayers = [
-  {"name":"الفجر","time":"06:09"},
-  {"name":"الشروق","time":"07:38"},
-  {"name":"الظهر","time":"12:49"},
-  {"name":"العصر","time":"17:39"},
-  {"name":"المغرب","time":"18:03"},
-  {"name":"العشاء","time":"19:24"}
-];
-
-const container = document.getElementById("prayerTable");
-prayers.forEach(p=>{
-  const div=document.createElement("div");
-  div.className="row";
-  div.innerHTML=`<span>${p.name}</span><span>${p.time}</span>`;
-  container.appendChild(div);
-});
-
-// الساعة والتاريخ
-function updateClockAndDates(){
-  const now=new Date();
-  document.getElementById("clock").innerText=now.toLocaleTimeString("ar-DZ",{hour12:false});
-  document.getElementById("gregorian").innerText=now.toLocaleDateString("ar-DZ",{
-    weekday:"long", year:"numeric", month:"long", day:"numeric"
-  });
-  const cutoff=new Date("2026-02-01T00:00:00");
-  const hijriDate=now<cutoff?"12 شعبان 1447":now.toLocaleDateString('ar-SA-u-ca-islamic',{day:'numeric', month:'long', year:'numeric'});
-  document.getElementById("hijri").innerText=hijriDate;
+// تابع للحصول على الوقت المحلي في الجزائر
+function getAlgiersNow(){
+  return new Date(new Date().toLocaleString("en-US",{timeZone:"Africa/Algiers"}));
 }
-setInterval(updateClockAndDates,1000);
-updateClockAndDates();
 
-// العد التنازلي للصلاة القادمة
+// قراءة مواقيت الصلاة من ملف JSON
+fetch("times.json")
+  .then(r => r.json())
+  .then(data => {
+    const prayers = data.prayers;
+    const container = document.getElementById("prayerTable");
+
+    prayers.forEach(p => {
+      const div = document.createElement("div");
+      div.className = "row";
+      div.innerHTML = `<span>${p.name}</span><span>${p.time}</span>`;
+      container.appendChild(div);
+    });
+
+    function updateClockAndDates(){
+      const now = getAlgiersNow();
+
+      // الساعة الحالية
+      document.getElementById("clock").innerText = now.toLocaleTimeString("ar-DZ",{hour12:false});
+
+      // التاريخ الميلادي
+      document.getElementById("gregorian").innerText = now.toLocaleDateString("ar-DZ",{
+        weekday:"long", year:"numeric", month:"long", day:"numeric"
+      });
+
+      // التاريخ الهجري المثبت حتى 01 فيفري 2026 الساعة 00:00
+      const cutoff = new Date("2026-02-01T00:00:00");
+      let hijriDate;
+      if(now < cutoff){
+          hijriDate = "12 شعبان 1447";
+      }else{
+          hijriDate = now.toLocaleDateString('ar-SA-u-ca-islamic',{day:'numeric', month:'long', year:'numeric'});
+      }
+      document.getElementById("hijri").innerText = hijriDate;
+    }
+
+    setInterval(updateClockAndDates,1000);
+    updateClockAndDates();
+  })
+  .catch(err=>console.error("خطأ في تحميل مواقيت الصلاة:", err));
+</script>
+
+<script>
+// العد التنازلي + تلوين الصلاة القادمة
 function updateNextPrayerCountdown() {
-  const now=new Date();
-  let targetTime=null;
-  let nextPrayerName="";
+  const rows = document.querySelectorAll(".row");
+  const now = getAlgiersNow();
+  let targetTime = null;
+  let nextPrayerName = "";
 
-  for(let p of prayers){
-    if(p.name==="الإمساك") continue;
-    const [h,m]=p.time.split(":").map(Number);
-    const total=h*60+m;
-    const currentMinutes=now.getHours()*60+now.getMinutes();
-    if(total>currentMinutes){
-      targetTime=new Date();
-      targetTime.setHours(h,m,0,0);
-      nextPrayerName=p.name;
+  // إيجاد أول صلاة لم يحين وقتها (تجاوز الإمساك)
+  for (let row of rows) {
+    const name = row.children[0].innerText.trim();
+    const time = row.children[1].innerText.trim();
+    if (name === "الإمساك") continue;
+    const [h, m] = time.split(":").map(Number);
+    const total = h * 60 + m;
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    if (total > currentMinutes) {
+      targetTime = new Date(now);
+      targetTime.setHours(h, m, 0, 0);
+      nextPrayerName = name;
       break;
     }
   }
 
-  if(!targetTime){
-    const p=prayers.find(p=>p.name!=="الإمساك") || prayers[0];
-    const [h,m]=p.time.split(":").map(Number);
-    targetTime=new Date();
-    targetTime.setDate(targetTime.getDate()+1);
-    targetTime.setHours(h,m,0,0);
-    nextPrayerName=p.name;
+  // إذا انتهت كل الصلوات، نأخذ أول صلاة غد
+  if (!targetTime) {
+    for (let row of rows) {
+      const name = row.children[0].innerText.trim();
+      if (name === "الإمساك") continue;
+      const time = row.children[1].innerText.trim();
+      const [h, m] = time.split(":").map(Number);
+      targetTime = new Date(now);
+      targetTime.setDate(targetTime.getDate() + 1);
+      targetTime.setHours(h, m, 0, 0);
+      nextPrayerName = name;
+      break;
+    }
   }
 
-  const diff=Math.max(0,targetTime-now);
-  const hrs=String(Math.floor(diff/3600000)).padStart(2,"0");
-  const mins=String(Math.floor((diff%3600000)/60000)).padStart(2,"0");
-  const secs=String(Math.floor((diff%60000)/1000)).padStart(2,"0");
+  const diff = Math.max(0, targetTime - now);
+  const hrs = String(Math.floor(diff / 3600000)).padStart(2,"0");
+  const mins = String(Math.floor((diff % 3600000) / 60000)).padStart(2,"0");
+  const secs = String(Math.floor((diff % 60000) / 1000)).padStart(2,"0");
 
-  document.getElementById("nextPrayerClock").innerText=`${hrs}:${mins}:${secs}`;
-  document.getElementById("countdownText").innerText=`الصلاة القادمة: ${nextPrayerName}`;
+  document.getElementById("nextPrayerClock").innerText =
+    hrs + ":" + mins + ":" + secs;
+
+  document.getElementById("countdownText").innerText =
+    "الصلاة القادمة: " + nextPrayerName;
 }
+
+// تحديث كل ثانية
 setInterval(updateNextPrayerCountdown,1000);
 updateNextPrayerCountdown();
 </script>
-</body>function highlightNextPrayer() {
-  const rows = document.querySelectorAll(".row");
-  const now = new Date();
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-  // إزالة الكلاس من كل الصفوف أولًا
-  rows.forEach(r => r.classList.remove("next-prayer"));
-
-  // إيجاد أول صلاة بعد الإمساك
-  for (let row of rows) {
-    const name = row.children[0].innerText.trim();
-    if (name === "الإمساك") continue;
-    const time = row.children[1].innerText.trim();
-    const [h, m] = time.split(":").map(Number);
-    const total = h * 60 + m;
-
-    if (total > currentMinutes) {
-      row.classList.add("next-prayer"); // تمييز الصف
-      break; // نوقف عند أول صلاة قادمة
-    }
-  }
-}
-
-// تحديث كل 30 ثانية أو كل دقيقة
-setInterval(highlightNextPrayer, 30000);
-highlightNextPrayer();
+</body>
 </html>
