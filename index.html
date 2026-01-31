@@ -31,7 +31,8 @@ body{
 .row.nextPrayer{ border:2px solid #00ff00; border-radius:6px; padding:6px 8px; }
 #nextPrayerClock{ font-size:32px; margin-top:8px; padding:6px 12px; border-radius:10px; background:rgba(0,255,0,0.05); border:1px solid rgba(0,255,0,0.3); color:#fff; }
 .next{ font-family:'Amiri', serif; font-weight:bold; }
-.footer{ font-size:12px; color:#ffd; margin-top:8px; text-align:center; opacity:0.8; }
+.footer{ font-size:12px; color:#ffd; margin-top:8px; text-align:center; opacity:0.8; display:flex; align-items:center; justify-content:center; gap:5px; }
+.footer img{ width:16px; height:16px; display:inline-block; }
 </style>
 </head>
 <body>
@@ -49,7 +50,10 @@ body{
 
   <div class="table" id="prayerTable"></div>
 
-  <div class="footer">misk elkhithem ©</div>
+  <div class="footer">
+    <img src="logo.png" alt="logo">
+    <span>misk elkhithem ©</span>
+  </div>
 </div>
 
 <script>
@@ -63,7 +67,7 @@ const prayers = [
   {"name":"العشاء","time":"19:24"}
 ];
 
-// إنشاء جدول الصلاة مرة واحدة
+// إنشاء جدول الصلاة
 const container = document.getElementById("prayerTable");
 prayers.forEach(p=>{
   const div=document.createElement("div");
@@ -88,9 +92,9 @@ function updateClockAndDates(){
   });
 
   // التاريخ الهجري: بدء 12 شعبان 1447 = 31 جانفي 2026
-  const startGregorian = new Date("2026-01-31"); // 31 جانفي 2026
+  const startGregorian = new Date("2026-01-31"); 
   const startHijriDay = 12;
-  const startHijriMonth = 8; // شعبان = 8
+  const startHijriMonth = 8; 
   const startHijriYear = 1447;
 
   const diffDays = Math.floor((now - startGregorian)/(1000*60*60*24));
@@ -98,7 +102,6 @@ function updateClockAndDates(){
   let hijriMonth = startHijriMonth;
   let hijriYear = startHijriYear;
 
-  // تبسيط التقويم: كل شهر هجري 30 يوم
   while(hijriDay > 30){
     hijriDay -=30;
     hijriMonth +=1;
