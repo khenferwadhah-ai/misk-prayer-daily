@@ -35,11 +35,51 @@ body{
   margin: 6px 0;
 }
 .table{width:100%;font-size:17px;margin-top:10px;}
-.row{ display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,.25); padding:6px 0; border-radius:6px; font-family:'Cairo', sans-serif; font-weight:700; }
-.row.nextPrayer{ border:2px solid gold; padding:6px 8px; background:rgba(255,215,0,0.15); }
-#nextPrayerClock{ font-size:32px; margin-top:8px; padding:6px 12px; border-radius:10px; background:rgba(0,0,0,0.3); border:2px solid gold; box-shadow:0 0 15px rgba(255,215,0,0.6); color:#ffffff; font-weight:bold; text-shadow:2px 2px 4px #000000; display:inline-block; }
-.next{ font-family:'Cairo', sans-serif; font-weight:bold; color:#ffffff; font-size:20px; display:inline-block; margin-right:8px; }
-.footer{ font-size:14px; margin-top:10px; display:flex; justify-content:center; align-items:center; gap:6px; color:#ffffff; }
+.row{
+  display:flex;
+  justify-content:space-between;
+  border-bottom:1px solid rgba(255,255,255,.25);
+  padding:6px 0;
+  border-radius:6px;
+  font-family:'Cairo', sans-serif;
+  font-weight:700;
+  transition: background 0.3s;
+}
+.row.nextPrayer{
+  border:2px solid gold;
+  padding:6px 8px;
+  background:rgba(255,215,0,0.25);
+}
+#nextPrayerClock{
+  font-size:32px;
+  margin-top:8px;
+  padding:6px 12px;
+  border-radius:10px;
+  background:rgba(0,0,0,0.3);
+  border:2px solid gold;
+  box-shadow:0 0 15px rgba(255,215,0,0.6);
+  color:#ffffff;
+  font-weight:bold;
+  text-shadow:2px 2px 4px #000000;
+  display:inline-block;
+}
+.next{
+  font-family:'Cairo', sans-serif;
+  font-weight:bold;
+  color:#ffffff;
+  font-size:20px;
+  display:inline-block;
+  margin-right:8px;
+}
+.footer{
+  font-size:14px;
+  margin-top:10px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:6px;
+  color:#ffffff;
+}
 .footer img{ width:20px; height:20px; }
 </style>
 </head>
@@ -136,6 +176,7 @@ function updateNextPrayerCountdown(){
     nextName=prayerNames[0];
   }
 
+  // وضع إطار ذهبي على الصلاة القادمة في الجدول
   if(nextRow) nextRow.classList.add("nextPrayer");
 
   const diff=target-now;
