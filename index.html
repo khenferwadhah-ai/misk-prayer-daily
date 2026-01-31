@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لوحة مواقيت الصلاة</title> .next-prayer {
+<title>لوحة مواقيت الصلاة</title>.next-prayer {
   border: 2px solid rgba(0, 255, 0, 0.6); /* إطار أخضر خفيف */
   border-radius: 6px;
   padding: 4px 8px;
@@ -168,5 +168,30 @@ function updateNextPrayerCountdown() {
 setInterval(updateNextPrayerCountdown,1000);
 updateNextPrayerCountdown();
 </script>
-</body>
+</body>function highlightNextPrayer() {
+  const rows = document.querySelectorAll(".row");
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  // إزالة الكلاس من كل الصفوف أولًا
+  rows.forEach(r => r.classList.remove("next-prayer"));
+
+  // إيجاد أول صلاة بعد الإمساك
+  for (let row of rows) {
+    const name = row.children[0].innerText.trim();
+    if (name === "الإمساك") continue;
+    const time = row.children[1].innerText.trim();
+    const [h, m] = time.split(":").map(Number);
+    const total = h * 60 + m;
+
+    if (total > currentMinutes) {
+      row.classList.add("next-prayer"); // تمييز الصف
+      break; // نوقف عند أول صلاة قادمة
+    }
+  }
+}
+
+// تحديث كل 30 ثانية أو كل دقيقة
+setInterval(highlightNextPrayer, 30000);
+highlightNextPrayer();
 </html>
