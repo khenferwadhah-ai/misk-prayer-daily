@@ -6,7 +6,6 @@
 <title>إمساكية رمضان</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/adhan@4.4.3/dist/adhan.min.js"></script>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',Tahoma;}
@@ -34,6 +33,7 @@ body{
   text-shadow:0 0 10px gold;
 }
 .date{margin:5px 0;font-size:17px;font-weight:700}
+
 .table{margin-top:10px}
 .row{
   display:flex;
@@ -88,16 +88,19 @@ body{
 </div>
 
 <script>
-/* ===== مواقيت دقيقة لولاية ميلة ===== */
+/* ===== جدول رمضان كامل (مثال) ===== */
+const ramadanSchedule = {
+"2026-02-17":["05:35","07:05","12:45","15:40","18:30","19:50"],
+"2026-02-18":["05:34","07:04","12:45","15:41","18:31","19:51"],
+"2026-02-19":["05:33","07:03","12:45","15:42","18:32","19:52"],
+// ⬅️ أكمل بقية أيام رمضان بنفس النمط
+};
+
 const prayerNames=["الفجر","الشروق","الظهر","العصر","المغرب","العشاء"];
-let rows=[], todayTimes=[];
+let rows=[];
+let todayTimes=[];
 
-/* إحداثيات ميلة */
-const coordinates=new adhan.Coordinates(36.45,6.27);
-const params=adhan.CalculationMethod.Algeria();
-params.madhab=adhan.Madhab.Maliki;
-
-/* بناء الجدول */
+/* ===== بناء الجدول مرة واحدة ===== */
 function buildTable(){
   const container=document.getElementById("prayerTable");
   container.innerHTML="";
@@ -111,38 +114,34 @@ function buildTable(){
   });
 }
 
-/* تحديث التاريخ والمواقيت */
+/* ===== تحديث التاريخ والمواقيت ===== */
 function updateDateAndTimes(){
   const now=new Date();
   document.getElementById("gregorian").innerText=
     now.toLocaleDateString("ar-DZ",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
 
-  const pt=new adhan.PrayerTimes(coordinates,now,params);
-
-  todayTimes=[
-    pt.fajr,
-    pt.sunrise,
-    pt.dhuhr,
-    pt.asr,
-    pt.maghrib,
-    pt.isha
-  ];
+  const key=now.toISOString().slice(0,10);
+  todayTimes=ramadanSchedule[key] || ramadanSchedule[Object.keys(ramadanSchedule)[0]];
 
   todayTimes.forEach((t,i)=>{
-    document.getElementById("t"+i).innerText=
-      t.toLocaleTimeString("ar-DZ",{hour:"2-digit",minute:"2-digit"});
+    document.getElementById("t"+i).innerText=t;
   });
 }
 
-/* العد التنازلي */
+/* ===== العدّ التنازلي للصلاة القادمة ===== */
 function updateCountdown(){
   const now=new Date();
+  const current=now.getHours()*60+now.getMinutes();
+
   rows.forEach(r=>r.classList.remove("nextPrayer"));
 
   let target,name,row;
   for(let i=0;i<todayTimes.length;i++){
-    if(todayTimes[i]>now){
-      target=todayTimes[i];
+    const [h,m]=todayTimes[i].split(":").map(Number);
+    const min=h*60+m;
+    if(min>current){
+      target=new Date();
+      target.setHours(h,m,0,0);
       name=prayerNames[i];
       row=rows[i];
       break;
@@ -150,8 +149,10 @@ function updateCountdown(){
   }
 
   if(!target){
-    target=new Date(todayTimes[0]);
+    const [h,m]=todayTimes[0].split(":").map(Number);
+    target=new Date();
     target.setDate(target.getDate()+1);
+    target.setHours(h,m,0,0);
     name=prayerNames[0];
     row=rows[0];
   }
@@ -167,7 +168,7 @@ function updateCountdown(){
   document.getElementById("nextPrayerClock").innerText=`${h}:${m}:${s}`;
 }
 
-/* تشغيل */
+/* ===== تشغيل ===== */
 buildTable();
 updateDateAndTimes();
 updateCountdown();
