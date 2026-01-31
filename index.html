@@ -25,12 +25,11 @@ body{
 }
 .logo{width:85px;margin-bottom:6px;}
 .title { font-family: 'Amiri', serif; color: #fff; font-weight: bold; margin: 6px 0; }
-.clock{ font-size:48px; font-weight:bold; margin:10px 0; padding:10px 20px; border-radius:12px; background:rgba(0,255,0,0.1); border:1px solid rgba(0,255,0,0.3); color:#bfff00; }
 .table{width:100%;font-size:17px;margin-top:10px;}
 .row{ display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,.25); padding:6px 0; }
 .row.nextPrayer{ border:2px solid #00ff00; border-radius:6px; padding:6px 8px; }
-#nextPrayerClock{ font-size:32px; margin-top:8px; padding:6px 12px; border-radius:10px; background:rgba(0,255,0,0.05); border:1px solid rgba(0,255,0,0.3); color:#fff; }
-.next{ font-family:'Amiri', serif; font-weight:bold; }
+#nextPrayerClock{ font-size:48px; margin:15px 0; padding:10px 20px; border-radius:12px; background:rgba(0,255,0,0.05); border:1px solid rgba(0,255,0,0.3); color:#fff; text-shadow: 0 0 6px #ffffff; font-weight:bold; }
+.next{ font-family:'Amiri', serif; font-weight:bold; font-size:20px; margin-top:5px; }
 .footer{ font-size:12px; color:#ffd; margin-top:8px; text-align:center; opacity:0.8; display:flex; align-items:center; justify-content:center; gap:5px; }
 .footer img{ width:16px; height:16px; display:inline-block; }
 </style>
@@ -43,8 +42,7 @@ body{
   <div class="date" id="gregorian">--</div>
   <div class="date" id="hijri">--</div>
 
-  <div class="clock" id="clock">00:00:00</div>
-
+  <!-- العد التنازلي أصبح هنا مكان الساعة القديمة -->
   <div class="next" id="countdownText">الصلاة القادمة: --</div>
   <div class="clock" id="nextPrayerClock">- --:--:--</div>
 
@@ -76,15 +74,9 @@ prayers.forEach(p=>{
   container.appendChild(div);
 });
 
-// تحديث الساعة والتاريخ الميلادي والهجري
+// تحديث التاريخ الميلادي والهجري
 function updateClockAndDates(){
   const now = new Date();
-
-  // الساعة الميلادية
-  const h = String(now.getHours()).padStart(2,'0');
-  const m = String(now.getMinutes()).padStart(2,'0');
-  const s = String(now.getSeconds()).padStart(2,'0');
-  document.getElementById("clock").innerText = `${h}:${m}:${s}`;
 
   // التاريخ الميلادي
   document.getElementById("gregorian").innerText = now.toLocaleDateString("ar-DZ",{
