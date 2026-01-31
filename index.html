@@ -32,6 +32,12 @@ body{
   text-shadow: 2px 2px 4px #000000, 0 0 6px #ffffff, 0 0 12px #ffffff;
   margin: 6px 0;
 }
+.date{
+  font-family: 'Cairo', sans-serif;
+  font-weight:700;
+  margin:4px 0;
+  font-size:18px;
+}
 .table{width:100%;font-size:17px;margin-top:10px;}
 .row{
   display:flex;
@@ -171,7 +177,6 @@ function updateNextPrayerCountdown(){
     nextName=prayerNames[0];
   }
 
-  // إضافة إطار ذهبي واضح على الصلاة القادمة
   if(nextRow) nextRow.classList.add("nextPrayer");
 
   const diff=target-now;
