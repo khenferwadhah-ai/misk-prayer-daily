@@ -86,12 +86,13 @@ prayers.forEach(p=>{
 // تحديث الساعة والتاريخ الهجري والميلادي
 function updateClockAndDates(){
   const now=new Date();
-  document.getElementById("clock").innerText=now.toLocaleTimeString("ar-DZ",{hour12:false});
-  document.getElementById("gregorian").innerText=now.toLocaleDateString("ar-DZ",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  document.getElementById("clock").innerText = now.toLocaleTimeString("ar-DZ",{hour12:false});
+  document.getElementById("gregorian").innerText = now.toLocaleDateString("ar-DZ",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
 
-  // التاريخ الهجري
-  const hijri = now.toLocaleDateString('ar-SA-u-ca-islamic',{day:'numeric', month:'long', year:'numeric', weekday:'long'});
-  document.getElementById("hijri").innerText=hijri;
+  // التاريخ الهجري مصحح لليوم 12 شعبان 1447
+  const cutoff = new Date("2026-02-01T00:00:00");
+  const hijriDate = now < cutoff ? "12 شعبان 1447" : now.toLocaleDateString('ar-SA-u-ca-islamic',{day:'numeric', month:'long', year:'numeric', weekday:'long'});
+  document.getElementById("hijri").innerText = hijriDate;
 }
 setInterval(updateClockAndDates,1000);
 updateClockAndDates();
