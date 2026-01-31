@@ -3,66 +3,66 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>إمساكية رمضان</title>
+<title>إمساكية رمضان – ميلة</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/adhan@4.4.3/dist/adhan.min.js"></script>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',Tahoma;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',Tahoma}
 body{
   height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
-  background:url("background.jpg") no-repeat center center fixed;
-  background-size:cover;
+  background:#000;
 }
 .overlay{
   width:95%;
   max-width:420px;
-  background:rgba(0,0,0,0.75);
-  border-radius:18px;
+  background:rgba(0,0,0,0.85);
+  border-radius:20px;
   padding:15px;
   text-align:center;
   color:white;
 }
-.logo{width:80px;margin-bottom:6px;}
+.logo{width:80px;margin-bottom:5px}
 .title{
   font-size:20px;
   font-weight:700;
+  color:gold;
   text-shadow:0 0 10px gold;
 }
-.date{margin:5px 0;font-size:17px;font-weight:700}
+.date{margin:4px 0;font-size:17px;font-weight:700}
+#ramadanDay{font-size:18px;color:#00ffcc}
 
 .table{margin-top:10px}
 .row{
   display:flex;
   justify-content:space-between;
-  padding:6px 8px;
-  border-bottom:1px solid rgba(255,255,255,.25);
-  font-weight:700;
+  padding:7px 10px;
+  border-bottom:1px solid rgba(255,255,255,.2);
+  font-size:18px;
 }
 .row.nextPrayer{
   background:gold;
   color:black;
-  border-radius:8px;
-}
-#nextPrayerClock{
-  font-size:30px;
-  margin:10px 0;
-  padding:6px 12px;
-  border:2px solid gold;
   border-radius:10px;
-  box-shadow:0 0 15px rgba(255,215,0,.7);
 }
+
+#nextPrayerClock{
+  font-size:34px;
+  margin:10px 0;
+  padding:8px 14px;
+  border:2px solid gold;
+  border-radius:12px;
+  box-shadow:0 0 20px rgba(255,215,0,.7);
+}
+
 .footer{
-  margin-top:10px;
+  margin-top:8px;
   font-size:14px;
-  display:flex;
-  justify-content:center;
-  gap:6px;
 }
-.footer img{width:20px}
 </style>
 </head>
 
@@ -70,94 +70,88 @@ body{
 
 <div class="overlay">
   <img src="logo.png" class="logo">
-  <div class="title">🌙 إمساكية رمضان</div>
-  <div class="title">الجمعية الخيرية مسك الختام</div>
+  <div class="title">🌙 إمساكية رمضان – ميلة</div>
 
-  <div class="date" id="gregorian">--</div>
+  <div class="date" id="gregorian"></div>
   <div class="date">رمضان 1447 هـ</div>
+  <div id="ramadanDay">اليوم -- من رمضان</div>
 
   <div id="countdownText">-- بعد:</div>
   <div id="nextPrayerClock">--:--:--</div>
 
   <div class="table" id="prayerTable"></div>
 
-  <div class="footer">
-    <img src="logo.png">
-    <span>misk elkhithem ©</span>
-  </div>
+  <div class="footer">الجمعية الخيرية مسك الختام ©</div>
 </div>
 
 <script>
-/* ===== جدول رمضان كامل (مثال) ===== */
-const ramadanSchedule = {
-"2026-02-17":["05:35","07:05","12:45","15:40","18:30","19:50"],
-"2026-02-18":["05:34","07:04","12:45","15:41","18:31","19:51"],
-"2026-02-19":["05:33","07:03","12:45","15:42","18:32","19:52"],
-// ⬅️ أكمل بقية أيام رمضان بنفس النمط
-};
-
 const prayerNames=["الفجر","الشروق","الظهر","العصر","المغرب","العشاء"];
-let rows=[];
-let todayTimes=[];
+let rows=[], times=[];
 
-/* ===== بناء الجدول مرة واحدة ===== */
+/* إحداثيات ميلة */
+const coords=new adhan.Coordinates(36.45,6.27);
+const params=adhan.CalculationMethod.Algeria();
+params.madhab=adhan.Madhab.Maliki;
+
+/* بناء الجدول */
 function buildTable(){
-  const container=document.getElementById("prayerTable");
-  container.innerHTML="";
-  rows=[];
-  prayerNames.forEach((name,i)=>{
+  const c=document.getElementById("prayerTable");
+  c.innerHTML=""; rows=[];
+  prayerNames.forEach(n=>{
     const r=document.createElement("div");
     r.className="row";
-    r.innerHTML=`<span>${name}</span><span id="t${i}">--:--</span>`;
-    container.appendChild(r);
+    r.innerHTML=`<span>${n}</span><span>--:--</span>`;
+    c.appendChild(r);
     rows.push(r);
   });
 }
 
-/* ===== تحديث التاريخ والمواقيت ===== */
-function updateDateAndTimes(){
+/* التواريخ */
+function updateDates(){
   const now=new Date();
   document.getElementById("gregorian").innerText=
     now.toLocaleDateString("ar-DZ",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
 
-  const key=now.toISOString().slice(0,10);
-  todayTimes=ramadanSchedule[key] || ramadanSchedule[Object.keys(ramadanSchedule)[0]];
+  const ramadanStart=new Date("2026-02-17");
+  const day=Math.floor((now-ramadanStart)/(1000*60*60*24))+1;
+  document.getElementById("ramadanDay").innerText=
+    day>0 && day<=30 ? `اليوم ${day} من رمضان` : "";
+}
 
-  todayTimes.forEach((t,i)=>{
-    document.getElementById("t"+i).innerText=t;
+/* حساب المواقيت */
+function calculateTimes(){
+  const now=new Date();
+  const pt=new adhan.PrayerTimes(coords,now,params);
+  times=[pt.fajr,pt.sunrise,pt.dhuhr,pt.asr,pt.maghrib,pt.isha];
+
+  times.forEach((t,i)=>{
+    rows[i].children[1].innerText=
+      t.toLocaleTimeString("ar-DZ",{hour:"2-digit",minute:"2-digit"});
   });
 }
 
-/* ===== العدّ التنازلي للصلاة القادمة ===== */
-function updateCountdown(){
+/* العد التنازلي */
+function countdown(){
   const now=new Date();
-  const current=now.getHours()*60+now.getMinutes();
-
   rows.forEach(r=>r.classList.remove("nextPrayer"));
 
-  let target,name,row;
-  for(let i=0;i<todayTimes.length;i++){
-    const [h,m]=todayTimes[i].split(":").map(Number);
-    const min=h*60+m;
-    if(min>current){
-      target=new Date();
-      target.setHours(h,m,0,0);
+  let target,name,index;
+  for(let i=0;i<times.length;i++){
+    if(times[i]>now){
+      target=times[i];
       name=prayerNames[i];
-      row=rows[i];
+      index=i;
       break;
     }
   }
-
   if(!target){
-    const [h,m]=todayTimes[0].split(":").map(Number);
-    target=new Date();
+    target=new Date(times[0]); 
     target.setDate(target.getDate()+1);
-    target.setHours(h,m,0,0);
-    name=prayerNames[0];
-    row=rows[0];
+    name=prayerNames[0]; 
+    index=0;
   }
 
-  row.classList.add("nextPrayer");
+  rows[index].classList.add("nextPrayer");
 
   const diff=target-now;
   const h=String(Math.floor(diff/3600000)).padStart(2,"0");
@@ -168,13 +162,14 @@ function updateCountdown(){
   document.getElementById("nextPrayerClock").innerText=`${h}:${m}:${s}`;
 }
 
-/* ===== تشغيل ===== */
+/* تشغيل */
 buildTable();
-updateDateAndTimes();
-updateCountdown();
+updateDates();
+calculateTimes();
+countdown();
 
-setInterval(updateCountdown,1000);
-setInterval(updateDateAndTimes,60000);
+setInterval(countdown,1000);
+setInterval(()=>{updateDates();calculateTimes()},60000);
 </script>
 
 </body>
