@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>إمساكية رمضان</title>
+<title>مواقيت الصلاة - ميلة</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
 
@@ -70,11 +70,10 @@ body{
 
 <div class="overlay">
   <img src="logo.png" class="logo">
-  <div class="title">🌙 إمساكية رمضان</div>
   <div class="title">الجمعية الخيرية مسك الختام</div>
 
   <div class="date" id="gregorian">--</div>
-  <div class="date">رمضان 1447 هـ</div>
+  <div class="date" id="hijri">--</div>
 
   <div id="countdownText">-- بعد:</div>
   <div id="nextPrayerClock">--:--:--</div>
@@ -88,19 +87,18 @@ body{
 </div>
 
 <script>
-/* ===== جدول رمضان كامل (مثال) ===== */
+/* ===== جدول مواقيت ميلة (رمضان مثال) ===== */
 const ramadanSchedule = {
 "2026-02-17":["05:35","07:05","12:45","15:40","18:30","19:50"],
 "2026-02-18":["05:34","07:04","12:45","15:41","18:31","19:51"],
 "2026-02-19":["05:33","07:03","12:45","15:42","18:32","19:52"],
-// ⬅️ أكمل بقية أيام رمضان بنفس النمط
 };
 
 const prayerNames=["الفجر","الشروق","الظهر","العصر","المغرب","العشاء"];
 let rows=[];
 let todayTimes=[];
 
-/* ===== بناء الجدول مرة واحدة ===== */
+/* ===== بناء الجدول ===== */
 function buildTable(){
   const container=document.getElementById("prayerTable");
   container.innerHTML="";
@@ -114,11 +112,35 @@ function buildTable(){
   });
 }
 
+/* ===== التاريخ الهجري (يبدأ من 13 شعبان 1447) ===== */
+function updateHijri(){
+  const startGregorian=new Date("2026-02-01");
+  const startHijriDay=13;
+  const hijriMonth="شعبان";
+  const hijriYear=1447;
+
+  const today=new Date();
+  const diffDays=Math.floor((today-startGregorian)/(1000*60*60*24));
+
+  let day=startHijriDay+diffDays;
+  let month=hijriMonth;
+
+  if(day>30){
+    day-=30;
+    month="رمضان";
+  }
+
+  document.getElementById("hijri").innerText=
+    `${day} ${month} ${hijriYear} هـ`;
+}
+
 /* ===== تحديث التاريخ والمواقيت ===== */
 function updateDateAndTimes(){
   const now=new Date();
   document.getElementById("gregorian").innerText=
     now.toLocaleDateString("ar-DZ",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+
+  updateHijri();
 
   const key=now.toISOString().slice(0,10);
   todayTimes=ramadanSchedule[key] || ramadanSchedule[Object.keys(ramadanSchedule)[0]];
@@ -128,7 +150,7 @@ function updateDateAndTimes(){
   });
 }
 
-/* ===== العدّ التنازلي للصلاة القادمة ===== */
+/* ===== العدّ التنازلي ===== */
 function updateCountdown(){
   const now=new Date();
   const current=now.getHours()*60+now.getMinutes();
