@@ -192,6 +192,8 @@ ctx.translate(r,r);
 
 function drawClock(){
  ctx.clearRect(-r,-r,canvas.width,canvas.height);
+
+ // إطار الساعة
  ctx.beginPath();
  ctx.arc(0,0,r-2,0,Math.PI*2);
  ctx.strokeStyle="black";
@@ -209,17 +211,17 @@ function drawClock(){
  }
 
  const now=new Date();
- drawHand((now.getHours()%12)*30+now.getMinutes()/2,r*0.5,4);
- drawHand(now.getMinutes()*6,r*0.7,3);
- drawHand(now.getSeconds()*6,r*0.85,1);
+ drawHand((now.getHours()%12)*30+now.getMinutes()/2,r*0.5,4,"black"); // الساعات
+ drawHand(now.getMinutes()*6,r*0.7,3,"black"); // الدقائق
+ drawHand(now.getSeconds()*6,r*0.85,1,"red"); // الثواني (أحمر)
 }
 
-function drawHand(deg,len,w){
+function drawHand(deg,len,w,color){
  ctx.beginPath();
  ctx.rotate(deg*Math.PI/180);
  ctx.moveTo(0,0);
  ctx.lineTo(0,-len);
- ctx.strokeStyle="black";
+ ctx.strokeStyle=color;
  ctx.lineWidth=w;
  ctx.stroke();
  ctx.rotate(-deg*Math.PI/180);
