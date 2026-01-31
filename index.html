@@ -50,9 +50,9 @@ body{
 .nextPrayerContainer .next{
   font-family:'Amiri', serif;
   font-weight:bold;
-  color:#000; /* نص أسود على الذهبي */
-  text-shadow: 0 0 4px #fff;
+  color:#ffffff; /* نص أبيض */
   font-size:20px;
+  text-shadow: 2px 2px 4px #000000; /* ظل خفيف أسود */
 }
 
 /* العد التنازلي */
@@ -129,9 +129,9 @@ prayers.forEach(p=>{
 // تحديث الساعة والتاريخ (ميلادي وهجري)
 function updateClockAndDates(){
   const now=new Date();
-  // التاريخ الميلادي
   document.getElementById("gregorian").innerText=
     now.toLocaleDateString("ar-DZ",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+
   // التاريخ الهجري يبدأ بـ 12 شعبان 1447 ويحدث يومياً
   const hijriBase = new Date("2026-01-31T00:00:00"); // 31 جانفي 2026
   const dayDiff = Math.floor((now - hijriBase)/(1000*60*60*24));
