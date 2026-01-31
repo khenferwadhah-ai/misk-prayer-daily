@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لوحة مواقيت الصلاة</title>
 <style> 
-/* ربط خط Amiri Quran */
 @font-face {
   font-family: 'AmiriQuran';
   src: url('fonts/AmiriQuran.ttf') format('truetype');
@@ -13,7 +12,6 @@
   font-style: normal;
 }
 
-/* الأساسيات */
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Tahoma',Arial;}
 body{
   height:100vh;
@@ -34,9 +32,9 @@ body{
 }
 .logo{width:85px;margin-bottom:6px;}
 
-/* العنوان بخط Amiri Quran */
+/* العنوان بخط أبيض جميل */
 .title {
-  font-family: 'AmiriQuran', serif;
+  font-family: 'AmiriQuran', serif; /* خط أبيض */
   color: #ffffff;
   font-weight: bold;
   text-shadow: 2px 2px 4px #000000, 0 0 6px #ffffff, 0 0 12px #ffffff;
@@ -76,7 +74,7 @@ body{
 
 /* جملة الصلاة القادمة */
 .next, #nextPrayerClock{
-  font-family:'AmiriQuran', serif;
+  font-family:'Amiri', serif;
   color:#ffffff;
   font-weight:bold;
   text-shadow:2px 2px 4px #000000,0 0 6px #ffffff,0 0 12px #ffffff;
@@ -132,7 +130,7 @@ function updateClockAndDates(){
 setInterval(updateClockAndDates,1000);
 updateClockAndDates();
 
-// العد التنازلي للصلاة القادمة
+// العد التنازلي للصلاة القادمة مع علامة -
 function updateNextPrayerCountdown() {
   const now=new Date();
   let targetTime=null;
@@ -165,7 +163,7 @@ function updateNextPrayerCountdown() {
   const mins=String(Math.floor((diff%3600000)/60000)).padStart(2,"0");
   const secs=String(Math.floor((diff%60000)/1000)).padStart(2,"0");
 
-  document.getElementById("nextPrayerClock").innerText=`${hrs}:${mins}:${secs}`;
+  document.getElementById("nextPrayerClock").innerText=`-${hrs}:${mins}:${secs}`;
   document.getElementById("countdownText").innerText=`الصلاة القادمة: ${nextPrayerName}`;
 }
 setInterval(updateNextPrayerCountdown,1000);
