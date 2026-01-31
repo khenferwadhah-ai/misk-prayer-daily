@@ -70,7 +70,7 @@ body{
 
 <div class="overlay">
   <img src="logo.png" class="logo">
-  <div class="title">الجمعية الخيرية مسك الختام القرارم قوقة</div>
+  <div class="title">الجمعية الخيرية مسك الختام</div>
 
   <div class="date" id="gregorian">--</div>
   <div class="date" id="hijri">--</div>
@@ -87,16 +87,50 @@ body{
 </div>
 
 <script>
-/* ===== جدول مواقيت ميلة (رمضان مثال) ===== */
+/* ===== جدول مواقيت ميلة (مثال رمضان 2026) ===== */
 const ramadanSchedule = {
 "2026-02-17":["05:35","07:05","12:45","15:40","18:30","19:50"],
 "2026-02-18":["05:34","07:04","12:45","15:41","18:31","19:51"],
 "2026-02-19":["05:33","07:03","12:45","15:42","18:32","19:52"],
 };
 
-const prayerNames=["الفجر","الشروق","الظهر","العصر","المغرب","العشاء"];
+const prayerNames=["الفجر","إمساك","الظهر","العصر","المغرب","العشاء"];
 let rows=[];
 let todayTimes=[];
+
+/* ===== التاريخ الهجري (يبدأ من 13 شعبان 1447) ===== */
+const hijriStart = new Date("2026-01-31"); // 13 شعبان 1447
+const hijriMonths = [
+"محرم","صفر","ربيع الأول","ربيع الثاني",
+"جمادى الأولى","جمادى الآخرة","رجب",
+"شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"
+];
+
+function updateHijri(){
+  const now=new Date();
+  const diffDays=Math.floor((now - hijriStart)/(1000*60*60*24));
+  let day=13 + diffDays;
+  let month=7; // شعبان
+  let year=1447;
+
+  while(day>30){
+    day-=30;
+    month++;
+    if(month>11){month=0;year++;}
+  }
+
+  document.getElementById("hijri").innerText=
+    `${day} ${hijriMonths[month]} ${year} هـ`;
+}
+
+/* ===== دالة حساب الإمساك قبل الفجر 10 دقائق ===== */
+function calcImsak(fajrTime){
+  const [h,m]=fajrTime.split(":").map(Number);
+  const d=new Date();
+  d.setHours(h,m-10,0,0);
+  return String(d.getHours()).padStart(2,"0")+":"+
+         String(d.getMinutes()).padStart(2,"0");
+}
 
 /* ===== بناء الجدول ===== */
 function buildTable(){
@@ -112,28 +146,6 @@ function buildTable(){
   });
 }
 
-/* ===== التاريخ الهجري (يبدأ من 13 شعبان 1447) ===== */
-function updateHijri(){
-  const startGregorian=new Date("2026-02-01");
-  const startHijriDay=13;
-  const hijriMonth="شعبان";
-  const hijriYear=1447;
-
-  const today=new Date();
-  const diffDays=Math.floor((today-startGregorian)/(1000*60*60*24));
-
-  let day=startHijriDay+diffDays;
-  let month=hijriMonth;
-
-  if(day>30){
-    day-=30;
-    month="رمضان";
-  }
-
-  document.getElementById("hijri").innerText=
-    `${day} ${month} ${hijriYear} هـ`;
-}
-
 /* ===== تحديث التاريخ والمواقيت ===== */
 function updateDateAndTimes(){
   const now=new Date();
@@ -145,25 +157,30 @@ function updateDateAndTimes(){
   const key=now.toISOString().slice(0,10);
   todayTimes=ramadanSchedule[key] || ramadanSchedule[Object.keys(ramadanSchedule)[0]];
 
-  todayTimes.forEach((t,i)=>{
-    document.getElementById("t"+i).innerText=t;
-  });
+  // الفجر
+  document.getElementById("t0").innerText=todayTimes[0];
+  // الإمساك = الفجر - 10 دقائق
+  document.getElementById("t1").innerText=calcImsak(todayTimes[0]);
+  // بقية الصلوات
+  for(let i=2;i<todayTimes.length;i++){
+    document.getElementById("t"+i).innerText=todayTimes[i];
+  }
 }
 
-/* ===== العدّ التنازلي ===== */
+/* ===== العد التنازلي ===== */
 function updateCountdown(){
   const now=new Date();
-  const current=now.getHours()*60+now.getMinutes();
-
   rows.forEach(r=>r.classList.remove("nextPrayer"));
 
   let target,name,row;
   for(let i=0;i<todayTimes.length;i++){
+    if(i===1) continue; // تجاهل خانة الإمساك
     const [h,m]=todayTimes[i].split(":").map(Number);
-    const min=h*60+m;
-    if(min>current){
-      target=new Date();
-      target.setHours(h,m,0,0);
+    const t=new Date();
+    t.setHours(h,m,0,0);
+
+    if(t>now){
+      target=t;
       name=prayerNames[i];
       row=rows[i];
       break;
@@ -171,12 +188,12 @@ function updateCountdown(){
   }
 
   if(!target){
-    const [h,m]=todayTimes[0].split(":").map(Number);
+    const [h,m]=todayTimes[2].split(":").map(Number); // بعد الفجر العدّ للتالي (الظهر)
     target=new Date();
     target.setDate(target.getDate()+1);
     target.setHours(h,m,0,0);
-    name=prayerNames[0];
-    row=rows[0];
+    name=prayerNames[2];
+    row=rows[2];
   }
 
   row.classList.add("nextPrayer");
@@ -194,7 +211,6 @@ function updateCountdown(){
 buildTable();
 updateDateAndTimes();
 updateCountdown();
-
 setInterval(updateCountdown,1000);
 setInterval(updateDateAndTimes,60000);
 </script>
