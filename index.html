@@ -23,63 +23,45 @@ body{
   text-align:center;
   color:white;
 }
-.logo{width:85px;margin-bottom:6px;}
-.title { 
-  font-family: 'Amiri', serif; 
-  color: #ffffff; 
-  font-weight: bold; 
-  text-shadow: 2px 2px 4px #000000, 0 0 6px #ffffff, 0 0 12px #ffffff; 
-  margin: 6px 0; 
-}
-.clock{ display:none; } /* تم حذف الساعة الخضراء */
+.title { font-family: 'Amiri', serif; color: #ffffff; font-weight: bold; text-shadow: 2px 2px 4px #000,0 0 6px #fff,0 0 12px #fff; margin: 6px 0; }
 .table{width:100%;font-size:17px;margin-top:10px;}
 .row{ display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,.25); padding:6px 0; }
-.row.nextPrayer{ border:2px solid gold; border-radius:6px; padding:6px 8px; } /* إطار ذهبي */
-#nextPrayerClock{ font-size:32px; margin-top:8px; padding:6px 12px; border-radius:10px; background:rgba(0,0,0,0.2); border:1px solid gold; box-shadow:0 0 10px rgba(255,215,0,0.4); color:#ffffff; text-shadow: 2px 2px 4px #000000; }
-.next{
-  font-family:'Amiri', serif;
-  font-weight:bold;
-  font-size:22px;
-  color:white;
-  padding:8px 15px;
-  border-radius:10px;
-  background:gold;
-  display:inline-block;
-}
-.footer{
-  margin-top:10px;
-  font-size:14px;
-  opacity:0.8;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:5px;
-}
-#logoSmall{width:18px; height:18px;}
-#logoClock{width:100px;height:100px;margin:10px auto; display:block;}
+.row.nextPrayer{ border:2px solid gold; border-radius:6px; padding:6px 8px; }
+.nextPrayerText{ display:inline-block; background:gold; color:white; font-weight:bold; padding:6px 12px; border-radius:10px; margin:8px 0; font-family:'Amiri', serif; font-size:18px; }
+.footer{ margin-top:12px; font-size:13px; display:flex; justify-content:center; align-items:center; gap:6px; color:white; font-weight:bold; }
 </style>
 </head>
 <body>
 <div class="overlay">
-  <img src="logo.png" class="logo">
-  <canvas id="logoClock"></canvas>
+
+  <!-- الساعة الدائرية مع اللوغو -->
+  <div style="position:relative; width:120px; height:120px; margin:auto;">
+    <img src="logo.png" style="width:100%; height:100%; border-radius:50%;">
+    <canvas id="logoClock" width="120" height="120" style="position:absolute; top:0; left:0;"></canvas>
+  </div>
+
   <div class="title">الجمعية الخيرية مسك الختام – القرارم قوقة</div>
+
   <div class="date" id="gregorian">--</div>
   <div class="date" id="hijri">--</div>
 
-  <div class="next" id="countdownText">الصلاة القادمة: --</div>
-  <div class="clock" id="nextPrayerClock">- --:--:--</div>
+  <!-- العد التنازلي للصلاة القادمة -->
+  <div class="nextPrayerText" id="countdownText">الصلاة القادمة: --</div>
+  <div class="nextPrayerText" id="nextPrayerClock">- --:--:--</div>
 
+  <!-- جدول الصلوات -->
   <div class="table" id="prayerTable"></div>
 
+  <!-- حقوق -->
   <div class="footer">
-    <img src="logo.png" id="logoSmall">
-    <span>misk elkhithem ©</span>
+    <img src="logo.png" style="width:18px; height:18px; border-radius:50%;">
+    misk elkhithem ©
   </div>
+
 </div>
 
 <script>
-// ✅ أوقات الصلاة ثابتة لكل يوم
+// ✅ مواقيت الصلاة الثابتة
 const prayers = [
   {"name":"الفجر","time":"06:09"},
   {"name":"الشروق","time":"07:38"},
@@ -99,12 +81,21 @@ prayers.forEach(p=>{
   container.appendChild(div);
 });
 
-// تحديث الساعة والتواريخ
+// الساعة الميلادية والهجرية
 function updateClockAndDates(){
   const now=new Date();
-  document.getElementById("gregorian").innerText = now.toLocaleDateString("ar-DZ",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
-  // الهجري: 12 شعبان 1447
-  document.getElementById("hijri").innerText = "12 شعبان 1447";
+  document.getElementById("clock")?.remove(); // إزالة أي ساعة سابقة
+  document.getElementById("gregorian").innerText = now.toLocaleDateString("ar-DZ",{weekday:"long", year:"numeric", month:"long", day:"numeric"});
+  
+  // هجري 12 شعبان 1447 بداية من 31 جانفي 2026
+  const base = new Date("2026-01-31T00:00:00");
+  const msPerDay = 24*60*60*1000;
+  const daysDiff = Math.floor((now - base)/msPerDay);
+  let hijriDay = 12 + daysDiff;
+  let hijriMonth = "شعبان";
+  let hijriYear = 1447;
+  while(hijriDay>30){ hijriDay-=30; hijriMonth="شعبان"; }
+  document.getElementById("hijri").innerText = `${hijriDay} ${hijriMonth} ${hijriYear}`;
 }
 setInterval(updateClockAndDates,1000);
 updateClockAndDates();
@@ -113,8 +104,10 @@ updateClockAndDates();
 function updateNextPrayerCountdown(){
   const rows=document.querySelectorAll(".row");
   rows.forEach(r=>r.classList.remove("nextPrayer"));
+
   const now=new Date();
   let target,nextRow,name;
+
   for(let i=0;i<prayers.length;i++){
     const [h,m]=prayers[i].time.split(":").map(Number);
     if(h*60+m > now.getHours()*60+now.getMinutes()){
@@ -125,6 +118,7 @@ function updateNextPrayerCountdown(){
       break;
     }
   }
+
   if(!target){
     const [h,m]=prayers[0].time.split(":").map(Number);
     target=new Date();
@@ -133,11 +127,14 @@ function updateNextPrayerCountdown(){
     nextRow=rows[0];
     name=prayers[0].name;
   }
+
   nextRow.classList.add("nextPrayer");
+
   const diff=target-now;
   const h=String(Math.floor(diff/3600000)).padStart(2,"0");
   const m=String(Math.floor(diff%3600000/60000)).padStart(2,"0");
   const s=String(Math.floor(diff%60000/1000)).padStart(2,"0");
+
   document.getElementById("nextPrayerClock").innerText=`- ${h}:${m}:${s}`;
   document.getElementById("countdownText").innerText=`الصلاة القادمة: ${name}`;
 }
@@ -158,7 +155,7 @@ function drawClock() {
 
 function drawNumbers(){
   ctx.font = radius*0.15 + "px Arial";
-  ctx.fillStyle = "black"; // أرقام سوداء
+  ctx.fillStyle = "white";
   ctx.textBaseline = "middle";
   ctx.textAlign = "center";
   for(let num=1; num<=12; num++){
@@ -174,12 +171,13 @@ function drawHands(){
   const sec = now.getSeconds();
   const min = now.getMinutes();
   const hour = now.getHours();
-  drawHand((hour%12)*5 + min/12, radius*0.5, 6, 'black'); // ساعة
-  drawHand(min, radius*0.7, 4, 'black'); // دقيقة
+
+  drawHand((hour%12)*5 + min/12, radius*0.5, 6); // ساعة
+  drawHand(min, radius*0.7, 4); // دقيقة
   drawHand(sec, radius*0.9, 2, 'red'); // ثانية
 }
 
-function drawHand(pos,length,width,color='black'){
+function drawHand(pos,length,width,color='white'){
   const angle = (Math.PI*2) * pos/60 - Math.PI/2;
   ctx.beginPath();
   ctx.lineWidth=width;
