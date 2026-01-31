@@ -4,14 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لوحة مواقيت الصلاة</title>
-<style> 
-@font-face {
-  font-family: 'AmiriQuran';
-  src: url('fonts/AmiriQuran.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
 
+<style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Tahoma',Arial;}
 body{
   height:100vh;
@@ -32,9 +26,9 @@ body{
 }
 .logo{width:85px;margin-bottom:6px;}
 
-/* العنوان بخط أبيض جميل */
+/* العنوان */
 .title {
-  font-family: 'AmiriQuran', serif; /* خط أبيض */
+  font-family: 'Amiri', serif; /* خط إسلامي جميل */
   color: #ffffff;
   font-weight: bold;
   text-shadow: 2px 2px 4px #000000, 0 0 6px #ffffff, 0 0 12px #ffffff;
@@ -57,7 +51,17 @@ body{
 
 /* جدول الصلوات */
 .table{width:100%;font-size:17px;margin-top:10px;}
-.row{display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.25);padding:6px 0;}
+.row{
+  display:flex;
+  justify-content:space-between;
+  border-bottom:1px solid rgba(255,255,255,.25);
+  padding:6px 0;
+}
+.row.nextPrayer{
+  border:2px solid #00ff00;   /* إطار أخضر للصلاة القادمة */
+  border-radius:6px;
+  padding:6px 8px;
+}
 
 /* العد التنازلي للصلاة القادمة */
 #nextPrayerClock{
@@ -92,7 +96,7 @@ body{
   <div class="clock" id="clock">00:00:00</div>
 
   <div class="next" id="countdownText">الصلاة القادمة: --</div>
-  <div class="clock" id="nextPrayerClock">--:--:--</div>
+  <div class="clock" id="nextPrayerClock">- --:--:--</div>
 
   <div class="table" id="prayerTable"></div>
 </div>
@@ -108,6 +112,7 @@ const prayers = [
   {"name":"العشاء","time":"19:24"}
 ];
 
+// إنشاء جدول الصلوات
 const container = document.getElementById("prayerTable");
 prayers.forEach(p=>{
   const div=document.createElement("div");
@@ -130,14 +135,18 @@ function updateClockAndDates(){
 setInterval(updateClockAndDates,1000);
 updateClockAndDates();
 
-// العد التنازلي للصلاة القادمة مع علامة -
-function updateNextPrayerCountdown() {
+// العد التنازلي للصلاة القادمة مع تمييزها بإطار
+function updateNextPrayerCountdown(){
+  const rows=document.querySelectorAll(".row");
   const now=new Date();
   let targetTime=null;
   let nextPrayerName="";
+  let nextRow=null;
 
-  for(let p of prayers){
-    if(p.name==="الإمساك") continue;
+  rows.forEach(r=>r.classList.remove("nextPrayer")); // إزالة تمييز سابق
+
+  for(let i=0;i<prayers.length;i++){
+    const p=prayers[i];
     const [h,m]=p.time.split(":").map(Number);
     const total=h*60+m;
     const currentMinutes=now.getHours()*60+now.getMinutes();
@@ -145,25 +154,30 @@ function updateNextPrayerCountdown() {
       targetTime=new Date();
       targetTime.setHours(h,m,0,0);
       nextPrayerName=p.name;
+      nextRow=rows[i];
       break;
     }
   }
 
   if(!targetTime){
-    const p=prayers.find(p=>p.name!=="الإمساك") || prayers[0];
+    const p=prayers[0];
     const [h,m]=p.time.split(":").map(Number);
     targetTime=new Date();
     targetTime.setDate(targetTime.getDate()+1);
     targetTime.setHours(h,m,0,0);
     nextPrayerName=p.name;
+    nextRow=rows[0];
   }
+
+  // تمييز الصلاة القادمة
+  if(nextRow) nextRow.classList.add("nextPrayer");
 
   const diff=Math.max(0,targetTime-now);
   const hrs=String(Math.floor(diff/3600000)).padStart(2,"0");
   const mins=String(Math.floor((diff%3600000)/60000)).padStart(2,"0");
   const secs=String(Math.floor((diff%60000)/1000)).padStart(2,"0");
 
-  document.getElementById("nextPrayerClock").innerText=`-${hrs}:${mins}:${secs}`;
+  document.getElementById("nextPrayerClock").innerText=`- ${hrs}:${mins}:${secs}`;
   document.getElementById("countdownText").innerText=`الصلاة القادمة: ${nextPrayerName}`;
 }
 setInterval(updateNextPrayerCountdown,1000);
