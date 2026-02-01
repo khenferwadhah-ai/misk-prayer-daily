@@ -26,56 +26,7 @@ body{
   text-align:center;
   color:white;
 }
-
-/* ===== الساعة ===== */
-.clock{
-  width:110px;
-  height:110px;
-  border:4px solid gold;
-  border-radius:50%;
-  margin:0 auto 8px;
-  position:relative;
-  background:radial-gradient(circle,#111,#000);
-}
-.clock span{
-  position:absolute;
-  width:100%;
-  height:100%;
-  text-align:center;
-  transform:rotate(calc(var(--i) * 30deg));
-}
-.clock span b{
-  display:inline-block;
-  transform:rotate(calc(var(--i) * -30deg));
-  font-size:14px;
-  margin-top:6px;
-}
-
-.hand{
-  position:absolute;
-  width:50%;
-  height:2px;
-  background:white;
-  top:50%;
-  left:50%;
-  transform-origin:0%;
-  transform:rotate(90deg);
-}
-.hand.hour{width:35%;height:4px;}
-.hand.minute{width:45%;height:3px;}
-.hand.second{width:48%;height:2px;background:red;}
-
-.center-dot{
-  position:absolute;
-  width:8px;
-  height:8px;
-  background:white;
-  border-radius:50%;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-}
-
+.logo{width:80px;margin-bottom:6px;}
 .title{
   font-size:20px;
   font-weight:700;
@@ -111,35 +62,15 @@ body{
   justify-content:center;
   gap:6px;
 }
+.footer img{width:20px}
 </style>
 </head>
 
 <body>
 
 <div class="overlay">
-
-  <!-- ===== الساعة الدائرية ===== -->
-  <div class="clock">
-    <span style="--i:1"><b>1</b></span>
-    <span style="--i:2"><b>2</b></span>
-    <span style="--i:3"><b>3</b></span>
-    <span style="--i:4"><b>4</b></span>
-    <span style="--i:5"><b>5</b></span>
-    <span style="--i:6"><b>6</b></span>
-    <span style="--i:7"><b>7</b></span>
-    <span style="--i:8"><b>8</b></span>
-    <span style="--i:9"><b>9</b></span>
-    <span style="--i:10"><b>10</b></span>
-    <span style="--i:11"><b>11</b></span>
-    <span style="--i:12"><b>12</b></span>
-
-    <div class="hand hour" id="hourHand"></div>
-    <div class="hand minute" id="minuteHand"></div>
-    <div class="hand second" id="secondHand"></div>
-    <div class="center-dot"></div>
-  </div>
-
-  <div class="title">الجمعية الخيرية مسك الختام</div>
+  <img src="logo.png" class="logo">
+  <div class="title">الجمعية الخيرية مسك الختام القرارم قوقة</div>
 
   <div class="date" id="gregorian">--</div>
   <div class="date" id="hijri">--</div>
@@ -150,47 +81,136 @@ body{
   <div class="table" id="prayerTable"></div>
 
   <div class="footer">
+    <img src="logo.png">
     <span>misk elkhithem ©</span>
   </div>
 </div>
 
 <script>
-/* ===== الساعة الحقيقية ===== */
-function updateClock(){
-  const now=new Date();
-  const s=now.getSeconds();
-  const m=now.getMinutes();
-  const h=now.getHours()%12;
+/* ================== بداية جدول المواقيت ================== */
+/* المرجع: الأحد 01 فيفري 2026 */
 
-  document.getElementById("secondHand").style.transform=`rotate(${s*6}deg)`;
-  document.getElementById("minuteHand").style.transform=`rotate(${m*6+s*0.1}deg)`;
-  document.getElementById("hourHand").style.transform=`rotate(${h*30+m*0.5}deg)`;
-}
-setInterval(updateClock,1000);
-updateClock();
+const TABLE_START_DATE = new Date("2026-02-01T00:00:00");
 
-/* ===== التاريخ الهجري ===== */
-const HIJRI_START_DATE=new Date("2026-02-01T00:00:00");
-const hijriMonths=["محرم","صفر","ربيع الأول","ربيع الثاني","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"];
+/* فجر – إمساك – ظهر – عصر – مغرب – عشاء */
+const prayerSchedule = [
+  ["06:09","05:59","12:49","15:40","18:04","19:25"], // 01 فيفري
+  ["06:08","05:58","12:49","15:41","18:05","19:26"],
+  ["06:07","05:57","12:49","15:42","18:07","19:27"],
+  ["06:07","05:57","12:49","15:42","18:08","19:27"],
+  ["06:06","05:56","12:49","15:43","18:09","19:28"],
+  ["06:05","05:55","12:49","15:44","18:10","19:29"],
+  ["06:04","05:54","12:50","15:45","18:11","19:30"],
+  ["06:03","05:53","12:50","15:46","18:12","19:31"],
+  ["06:03","05:53","12:50","15:47","18:13","19:32"],
+  ["06:02","05:52","12:50","15:47","18:14","19:33"],
+  ["06:01","05:51","12:50","15:48","18:15","19:34"],
+  ["06:00","05:50","12:50","15:49","18:16","19:35"],
+  ["05:59","05:49","12:50","15:50","18:17","19:36"],
+  ["05:58","05:48","12:50","15:51","18:18","19:37"],
+  ["05:57","05:47","12:50","15:51","18:19","19:38"],
+  ["05:56","05:46","12:49","15:52","18:20","19:39"],
+  ["05:55","05:45","12:49","15:53","18:21","19:40"]
+];
+
+const prayerNames=["الفجر","الإمساك","الظهر","العصر","المغرب","العشاء"];
+let rows=[], todayTimes=[];
+
+/* ================== التاريخ الهجري (نهائي) ================== */
+/* الأحد 01 فيفري 2026 = 13 شعبان 1447 */
+
+const HIJRI_START_DATE = new Date("2026-02-01T00:00:00");
+const hijriMonths=[
+  "محرم","صفر","ربيع الأول","ربيع الثاني",
+  "جمادى الأولى","جمادى الآخرة","رجب",
+  "شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"
+];
 
 function updateHijri(){
   const today=new Date();
   today.setHours(0,0,0,0);
-  const diff=Math.floor((today-HIJRI_START_DATE)/86400000);
-  let d=13+diff,m=7,y=1447;
-  while(d>30){d-=30;m++;if(m>11){m=0;y++;}}
-  document.getElementById("hijri").innerText=`${d} ${hijriMonths[m]} ${y} هـ`;
+
+  const diffDays=Math.floor(
+    (today.getTime()-HIJRI_START_DATE.getTime())/86400000
+  );
+
+  let day=13+diffDays,month=7,year=1447;
+
+  while(day>30){
+    day-=30;
+    month++;
+    if(month>11){month=0;year++;}
+  }
+
+  document.getElementById("hijri").innerText=
+    `${day} ${hijriMonths[month]} ${year} هـ`;
 }
 
-/* ===== تاريخ ميلادي ===== */
-function updateGregorian(){
+/* ================== بناء الجدول ================== */
+function buildTable(){
+  const c=document.getElementById("prayerTable");
+  c.innerHTML="";
+  rows=[];
+  prayerNames.forEach((n,i)=>{
+    const r=document.createElement("div");
+    r.className="row";
+    r.innerHTML=`<span>${n}</span><span id="t${i}">--:--</span>`;
+    c.appendChild(r);
+    rows.push(r);
+  });
+}
+
+/* ================== تحديث التاريخ والمواقيت ================== */
+function updateDateAndTimes(){
+  const now=new Date();
   document.getElementById("gregorian").innerText=
-    new Date().toLocaleDateString("ar-DZ",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+    now.toLocaleDateString("ar-DZ",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+
+  updateHijri();
+
+  const diffDays=Math.floor((now-TABLE_START_DATE)/86400000);
+  const index=Math.min(Math.max(diffDays,0),prayerSchedule.length-1);
+
+  todayTimes=prayerSchedule[index];
+  todayTimes.forEach((t,i)=>document.getElementById("t"+i).innerText=t);
 }
 
-updateHijri();
-updateGregorian();
-setInterval(updateGregorian,60000);
+/* ================== العد التنازلي ================== */
+function updateCountdown(){
+  const now=new Date();
+  rows.forEach(r=>r.classList.remove("nextPrayer"));
+
+  let target,row,name;
+  for(let i=0;i<todayTimes.length;i++){
+    if(i===1) continue;
+    const [h,m]=todayTimes[i].split(":").map(Number);
+    const t=new Date();
+    t.setHours(h,m,0,0);
+    if(t>now){target=t;row=rows[i];name=prayerNames[i];break;}
+  }
+
+  if(!target){
+    const [h,m]=todayTimes[2].split(":").map(Number);
+    target=new Date();
+    target.setDate(target.getDate()+1);
+    target.setHours(h,m,0,0);
+    row=rows[2];
+    name=prayerNames[2];
+  }
+
+  row.classList.add("nextPrayer");
+  const d=target-now;
+  document.getElementById("countdownText").innerText=`${name} بعد:`;
+  document.getElementById("nextPrayerClock").innerText=
+    `${String(Math.floor(d/3600000)).padStart(2,"0")}:${String(Math.floor(d%3600000/60000)).padStart(2,"0")}:${String(Math.floor(d%60000/1000)).padStart(2,"0")}`;
+}
+
+/* ================== تشغيل ================== */
+buildTable();
+updateDateAndTimes();
+updateCountdown();
+setInterval(updateCountdown,1000);
+setInterval(updateDateAndTimes,60000);
 </script>
 
 </body>
