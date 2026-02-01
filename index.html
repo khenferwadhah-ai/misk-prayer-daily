@@ -48,7 +48,7 @@ body{
   border-radius:8px;
 }
 
-/* ===== إطار العد التنازلي مع اللوغو ===== */
+/* ===== العد التنازلي مع اللوغو ===== */
 #nextPrayerClockContainer {
   border:2px solid gold;
   border-radius:10px;
@@ -63,9 +63,36 @@ body{
   font-size:30px;
 }
 #nextPrayerClockContainer img{
-  width:35px;  /* حجم لوغو الجرس */
+  width:35px;
   height:35px;
 }
+
+/* ===== النص المتحرك من اليسار إلى اليمين ===== */
+#newsTicker{
+  width:100%;
+  overflow:hidden;
+  white-space:nowrap;
+  box-sizing:border-box;
+  border-radius:8px;
+  margin:5px 0 10px 0;
+  background:rgba(255,215,0,0.1);
+  padding:5px 0;
+  font-weight:700;
+  font-size:16px;
+  position:relative;
+  color:gold;
+}
+#newsTicker span{
+  display:inline-block;
+  position:relative;
+  left:-100%;
+  animation:scrollLeft 15s linear infinite;
+}
+@keyframes scrollLeft{
+  0%{left:-100%;}
+  100%{left:100%;}
+}
+
 .footer{
   margin-top:10px;
   font-size:14px;
@@ -82,6 +109,11 @@ body{
 
   <!-- لوغو الجمعية -->
   <img src="logo.png" class="logo" alt="لوغو الجمعية">
+
+  <!-- نص متحرك إخباري -->
+  <div id="newsTicker">
+    <span>تذكير بصيام أيام البيض التي تبدأ من يوم غد الاحد 01 فيفري الى غاية يوم الثلاثاء 03 فيفري 2026 - الجمعية الخيرية مسك الختام القرارم قوقة</span>
+  </div>
 
   <div class="title">الجمعية الخيرية مسك الختام</div>
 
@@ -104,9 +136,8 @@ body{
 <script>
 /* ===== جدول مواقيت الصلاة ===== */
 const TABLE_START_DATE = new Date("2026-02-01T00:00:00");
-/* فجر – إمساك – ظهر – عصر – مغرب – عشاء */
 const prayerSchedule = [
-  ["06:09","05:59","12:49","15:40","18:04","19:25"], // 01 فيفري
+  ["06:09","05:59","12:49","15:40","18:04","19:25"],
   ["06:08","05:58","12:49","15:41","18:05","19:26"],
   ["06:07","05:57","12:49","15:42","18:07","19:27"],
   ["06:07","05:57","12:49","15:42","18:08","19:27"],
