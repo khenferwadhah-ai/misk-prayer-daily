@@ -210,6 +210,61 @@ function updateDateAndTimes(){
 
 
 buildTable();
+function updateCountdown(){
+  if(!todayTimes.length) return;
+
+  const now = new Date();
+  rows.forEach(r => r.classList.remove("nextPrayer"));
+
+  let target = null;
+  let index = -1;
+
+  // 🔹 البحث عن الصلاة القادمة (تخطي الإمساك فقط)
+  for(let i = 0; i < todayTimes.length; i++){
+    if(i === 1) continue; // الإمساك
+
+    const [h,m] = todayTimes[i].split(":").map(Number);
+    const t = new Date();
+    t.setHours(h,m,0,0);
+
+    if(t > now){
+      target = t;
+      index = i;
+      break;
+    }
+  }
+
+  // 🔹 بعد العشاء → فجر الغد
+  if(!target){
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const diffDays = Math.floor((tomorrow - TABLE_START_DATE) / 86400000);
+    const tableIndex = Math.min(Math.max(diffDays,0), prayerSchedule.length-1);
+    const tomorrowTimes = prayerSchedule[tableIndex];
+
+    const [h,m] = tomorrowTimes[0].split(":").map(Number);
+    target = new Date();
+    target.setDate(target.getDate() + 1);
+    target.setHours(h,m,0,0);
+
+    index = 0;
+  }
+
+  // 🔹 تمييز الصلاة القادمة
+  rows[index].classList.add("nextPrayer");
+
+  const diff = target - now;
+  if(diff <= 0) return;
+
+  document.getElementById("countdownText").innerText =
+    `${prayerNames[index]} بعد:`;
+
+  document.getElementById("nextPrayerClock").innerText =
+    `${String(Math.floor(diff/3600000)).padStart(2,"0")}:` +
+    `${String(Math.floor(diff%3600000/60000)).padStart(2,"0")}:` +
+    `${String(Math.floor(diff%60000/1000)).padStart(2,"0")}`;
+}
 updateDateAndTimes();
 updateCountdown();
 setInterval(updateCountdown,1000);
