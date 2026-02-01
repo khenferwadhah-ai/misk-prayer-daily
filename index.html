@@ -10,7 +10,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',Tahoma;}
 body{
-  height:110vh;
+  height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
@@ -31,6 +31,7 @@ body{
 
 .logo{width:80px;margin-bottom:6px;}
 
+/* 🔽 تم تقريب السطور هنا فقط */
 .title{
   font-size:20px;
   font-weight:700;
@@ -39,7 +40,7 @@ body{
 }
 .date{
   margin:2px 0;
-  font-size:11px;
+  font-size:17px;
   font-weight:700;
 }
 
@@ -61,7 +62,7 @@ body{
 #nextPrayerClockContainer{
   border:2px solid gold;
   border-radius:10px;
-  padding:18px 22px;
+  padding:6px 12px;
   box-shadow:0 0 15px rgba(255,215,0,.7);
   display:flex;
   align-items:center;
@@ -90,9 +91,13 @@ body{
 }
 #newsTicker span{
   display:inline-block;
-  position:absolute;
-  white-space:nowrap;
-  left:-100%; /* البداية خارج الشاشة على اليسار */
+  position:relative;
+  left:-100%;
+  animation:scrollLeft 20s linear infinite;
+}
+@keyframes scrollLeft{
+  0%{left:-100%;}
+  100%{left:100%;}
 }
 
 .footer{
@@ -139,7 +144,6 @@ body{
 </div>
 
 <script>
-// ===== جدول الصلوات =====
 const TABLE_START_DATE = new Date("2026-02-01T00:00:00");
 const prayerSchedule = [
   ["06:09","05:59","12:49","15:40","18:04","19:25"],
@@ -163,19 +167,17 @@ const prayerSchedule = [
 const prayerNames=["الفجر","الإمساك","الظهر","العصر","المغرب","العشاء"];
 let rows=[], todayTimes=[];
 
-// ===== التاريخ الهجري =====
-const HIJRI_START_DATE = new Date("2026-02-01T00:00:00");
+const HIJRI_START_DATE=new Date("2026-02-01T00:00:00");
 const hijriMonths=["محرم","صفر","ربيع الأول","ربيع الثاني","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"];
 
 function updateHijri(){
-  const today = new Date(); today.setHours(0,0,0,0);
-  const diff = Math.floor((today - HIJRI_START_DATE)/86400000);
-  let d=13+diff, m=7, y=1447;
-  while(d>30){d-=30; m++; if(m>11){m=0;y++;}}
-  document.getElementById("hijri").innerText = `${d} ${hijriMonths[m]} ${y} هـ`;
+  const today=new Date();today.setHours(0,0,0,0);
+  const diff=Math.floor((today-HIJRI_START_DATE)/86400000);
+  let d=13+diff,m=7,y=1447;
+  while(d>30){d-=30;m++;if(m>11){m=0;y++;}}
+  document.getElementById("hijri").innerText=`${d} ${hijriMonths[m]} ${y} هـ`;
 }
 
-// ===== بناء جدول الصلوات =====
 function buildTable(){
   const c=document.getElementById("prayerTable");
   c.innerHTML="";
@@ -189,75 +191,45 @@ function buildTable(){
   });
 }
 
-// ===== تحديث التاريخ وأوقات الصلاة =====
 function updateDateAndTimes(){
-  const now = new Date();
+  const now=new Date();
   document.getElementById("gregorian").innerText=
     now.toLocaleDateString("ar-DZ",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
   updateHijri();
-  const diffDays = Math.floor((now - TABLE_START_DATE)/86400000);
-  const index = Math.min(Math.max(diffDays,0),prayerSchedule.length-1);
-  todayTimes = prayerSchedule[index];
-  todayTimes.forEach((t,i)=>document.getElementById("t"+i).innerText = t);
+  const diffDays=Math.floor((now-TABLE_START_DATE)/86400000);
+  const index=Math.min(Math.max(diffDays,0),prayerSchedule.length-1);
+  todayTimes=prayerSchedule[index];
+  todayTimes.forEach((t,i)=>document.getElementById("t"+i).innerText=t);
 }
 
-// ===== العد التنازلي =====
 function updateCountdown(){
-  const now = new Date();
+  const now=new Date();
   rows.forEach(r=>r.classList.remove("nextPrayer"));
   let target,row,name;
   for(let i=0;i<todayTimes.length;i++){
     if(i===1) continue;
     const [h,m]=todayTimes[i].split(":").map(Number);
-    const t=new Date(); t.setHours(h,m,0,0);
-    if(t>now){target=t; row=rows[i]; name=prayerNames[i]; break;}
+    const t=new Date();t.setHours(h,m,0,0);
+    if(t>now){target=t;row=rows[i];name=prayerNames[i];break;}
   }
   if(!target){
     const [h,m]=todayTimes[2].split(":").map(Number);
-    target=new Date(); target.setDate(target.getDate()+1);
+    target=new Date();target.setDate(target.getDate()+1);
     target.setHours(h,m,0,0);
-    row=rows[2]; name=prayerNames[2];
+    row=rows[2];name=prayerNames[2];
   }
   row.classList.add("nextPrayer");
-  const d = target - now;
-  document.getElementById("countdownText").innerText = `${name} بعد:`;
-  document.getElementById("nextPrayerClock").innerText =
+  const d=target-now;
+  document.getElementById("countdownText").innerText=`${name} بعد:`;
+  document.getElementById("nextPrayerClock").innerText=
     `${String(Math.floor(d/3600000)).padStart(2,"0")}:${String(Math.floor(d%3600000/60000)).padStart(2,"0")}:${String(Math.floor(d%60000/1000)).padStart(2,"0")}`;
 }
 
-// ===== شريط الأخبار الجديد =====
-function scrollNews() {
-  const ticker = document.querySelector("#newsTicker span");
-  const containerWidth = document.getElementById("newsTicker").offsetWidth;
-  const textWidth = ticker.offsetWidth;
-
-  let pos = -textWidth; // البداية خارج الشاشة على اليسار
-  const speed = 2; // سرعة الحركة
-
-  function move() {
-    pos += speed; // التحرك من اليسار إلى اليمين
-    ticker.style.left = pos + "px";
-
-    if (pos < containerWidth) {
-      requestAnimationFrame(move);
-    } else {
-      pos = -textWidth; // إعادة للنقطة البداية بعد اختفاء النص على اليمين
-      setTimeout(move, 500); // توقف نصف ثانية قبل البدء من جديد
-    }
-  }
-
-  move();
-}
-
-// ===== تشغيل كل شيء =====
 buildTable();
 updateDateAndTimes();
 updateCountdown();
-scrollNews();
-
 setInterval(updateCountdown,1000);
 setInterval(updateDateAndTimes,60000);
-
 </script>
 
 </body>
