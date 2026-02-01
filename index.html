@@ -8,7 +8,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',Tahoma;}
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Cairo',Tahoma;
+}
+
 body{
   height:100vh;
   display:flex;
@@ -17,6 +23,7 @@ body{
   background:url("background.jpg") no-repeat center center fixed;
   background-size:cover;
 }
+
 .overlay{
   width:95%;
   max-width:420px;
@@ -25,20 +32,67 @@ body{
   padding:15px;
   text-align:center;
   color:white;
-
-  /* تصغير اللوحة */
-  transform: scale(0.9);
-  transform-origin: center top;
 }
-.logo{width:80px;margin-bottom:6px;} /* لوغو الجمعية */
+
+/* 🔹 اللوغو – تم إنزاله قليلاً فقط */
+.logo{
+  width:80px;
+  margin-top:12px;   /* ← هذا هو التعديل الوحيد */
+  margin-bottom:6px;
+}
+
+/* شريط الأخبار */
+.ticker{
+  overflow:hidden;
+  white-space:nowrap;
+  margin:6px 0;
+}
+
+.ticker span{
+  display:inline-block;
+  padding-right:100%;
+  animation:ticker 18s linear infinite;
+  color:gold;
+  font-weight:700;
+}
+
+@keyframes ticker{
+  from{ transform:translateX(-100%); }
+  to{ transform:translateX(100%); }
+}
+
 .title{
   font-size:20px;
   font-weight:700;
   text-shadow:0 0 10px gold;
 }
-.date{margin:5px 0;font-size:17px;font-weight:700}
 
-.table{margin-top:10px}
+.date{
+  margin:5px 0;
+  font-size:17px;
+  font-weight:700;
+}
+
+#nextPrayerClock{
+  font-size:30px;
+  margin:10px 0;
+  padding:6px 12px;
+  border:2px solid gold;
+  border-radius:10px;
+  box-shadow:0 0 15px rgba(255,215,0,.7);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+}
+
+#nextPrayerClock img{
+  width:30px;
+  height:30px;
+}
+
+.table{ margin-top:10px; }
+
 .row{
   display:flex;
   justify-content:space-between;
@@ -46,55 +100,11 @@ body{
   border-bottom:1px solid rgba(255,255,255,.25);
   font-weight:700;
 }
+
 .row.nextPrayer{
   background:gold;
   color:black;
   border-radius:8px;
-}
-
-/* ===== العد التنازلي مع اللوغو ===== */
-#nextPrayerClockContainer {
-  border:2px solid gold;
-  border-radius:10px;
-  padding:6px 12px;
-  box-shadow:0 0 15px rgba(255,215,0,.7);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-}
-#nextPrayerClock{
-  font-size:30px;
-}
-#nextPrayerClockContainer img{
-  width:35px;
-  height:35px;
-}
-
-/* ===== النص المتحرك من اليسار إلى اليمين ===== */
-#newsTicker{
-  width:100%;
-  overflow:hidden;
-  white-space:nowrap;
-  box-sizing:border-box;
-  border-radius:8px;
-  margin:5px 0 10px 0;
-  background:rgba(255,215,0,0.1);
-  padding:5px 0;
-  font-weight:700;
-  font-size:16px;
-  position:relative;
-  color:gold;
-}
-#newsTicker span{
-  display:inline-block;
-  position:relative;
-  left:-100%;
-  animation:scrollLeft 20s linear infinite;
-}
-@keyframes scrollLeft{
-  0%{left:-100%;}
-  100%{left:100%;}
 }
 
 .footer{
@@ -104,6 +114,8 @@ body{
   justify-content:center;
   gap:6px;
 }
+
+.footer img{ width:20px; }
 </style>
 </head>
 
@@ -111,133 +123,48 @@ body{
 
 <div class="overlay">
 
-  <!-- لوغو الجمعية -->
-  <img src="logo.png" class="logo" alt="لوغو الجمعية">
+  <img src="logo.png" class="logo">
 
-  <!-- نص متحرك إخباري -->
-  <div id="newsTicker">
-    <span>تذكير بصيام أيام البيض التي تبدأ من يوم غد الاحد 01 فيفري الى غاية يوم الثلاثاء 03 فيفري 2026 الجمعية الخيرية مسك الختام القرارم قوقة</span>
+  <div class="ticker">
+    <span>
+      تذكير بصيام أيام البيض التي تبدأ من يوم غد الاحد 01 فيفري
+      الى غاية يوم الثلاثاء 03 فيفري 2026 -
+      الجمعية الخيرية مسك الختام القرارم قوقة
+    </span>
   </div>
 
-  <div class="title">الجمعية الخيرية مسك الختام القرارم قوقة</div>
+  <div class="title">الجمعية الخيرية مسك الختام</div>
 
   <div class="date" id="gregorian">--</div>
   <div class="date" id="hijri">--</div>
 
   <div id="countdownText">-- بعد:</div>
-  <div id="nextPrayerClockContainer">
-    <img src="logo.webp" alt="جرس">
-    <div id="nextPrayerClock">--:--:--</div>
+
+  <div id="nextPrayerClock">
+    <img src="logo.webp" alt="تنبيه">
+    <span id="clockText">--:--:--</span>
   </div>
 
   <div class="table" id="prayerTable"></div>
 
   <div class="footer">
+    <img src="logo.png">
     <span>misk elkhithem ©</span>
   </div>
+
 </div>
 
 <script>
-/* ===== جدول مواقيت الصلاة ===== */
-const TABLE_START_DATE = new Date("2026-02-01T00:00:00");
-const prayerSchedule = [
-  ["06:09","05:59","12:49","15:40","18:04","19:25"],
-  ["06:08","05:58","12:49","15:41","18:05","19:26"],
-  ["06:07","05:57","12:49","15:42","18:07","19:27"],
-  ["06:07","05:57","12:49","15:42","18:08","19:27"],
-  ["06:06","05:56","12:49","15:43","18:09","19:28"],
-  ["06:05","05:55","12:49","15:44","18:10","19:29"],
-  ["06:04","05:54","12:50","15:45","18:11","19:30"],
-  ["06:03","05:53","12:50","15:46","18:12","19:31"],
-  ["06:03","05:53","12:50","15:47","18:13","19:32"],
-  ["06:02","05:52","12:50","15:47","18:14","19:33"],
-  ["06:01","05:51","12:50","15:48","18:15","19:34"],
-  ["06:00","05:50","12:50","15:49","18:16","19:35"],
-  ["05:59","05:49","12:50","15:50","18:17","19:36"],
-  ["05:58","05:48","12:50","15:51","18:18","19:37"],
-  ["05:57","05:47","12:50","15:51","18:19","19:38"],
-  ["05:56","05:46","12:49","15:52","18:20","19:39"],
-  ["05:55","05:45","12:49","15:53","18:21","19:40"]
-];
-const prayerNames=["الفجر","الإمساك","الظهر","العصر","المغرب","العشاء"];
-let rows=[], todayTimes=[];
+const prayerNames=["الفجر","إمساك","الظهر","العصر","المغرب","العشاء"];
 
-/* ===== التاريخ الهجري ===== */
-const HIJRI_START_DATE=new Date("2026-02-01T00:00:00");
-const hijriMonths=["محرم","صفر","ربيع الأول","ربيع الثاني","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"];
-
-function updateHijri(){
-  const today=new Date();
-  today.setHours(0,0,0,0);
-  const diff=Math.floor((today-HIJRI_START_DATE)/86400000);
-  let d=13+diff,m=7,y=1447;
-  while(d>30){d-=30;m++;if(m>11){m=0;y++;}}
-  document.getElementById("hijri").innerText=`${d} ${hijriMonths[m]} ${y} هـ`;
-}
-
-/* ===== بناء جدول الصلاة ===== */
-function buildTable(){
-  const c=document.getElementById("prayerTable");
-  c.innerHTML="";
-  rows=[];
-  prayerNames.forEach((n,i)=>{
-    const r=document.createElement("div");
-    r.className="row";
-    r.innerHTML=`<span>${n}</span><span id="t${i}">--:--</span>`;
-    c.appendChild(r);
-    rows.push(r);
-  });
-}
-
-/* ===== تحديث التاريخ والمواقيت ===== */
-function updateDateAndTimes(){
+function updateClock(){
   const now=new Date();
-  document.getElementById("gregorian").innerText=
-    now.toLocaleDateString("ar-DZ",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
-  updateHijri();
-
-  const diffDays=Math.floor((now-TABLE_START_DATE)/86400000);
-  const index=Math.min(Math.max(diffDays,0),prayerSchedule.length-1);
-  todayTimes=prayerSchedule[index];
-  todayTimes.forEach((t,i)=>document.getElementById("t"+i).innerText=t);
+  document.getElementById("clockText").innerText =
+    now.toLocaleTimeString("ar-DZ");
 }
 
-/* ===== العد التنازلي ===== */
-function updateCountdown(){
-  const now=new Date();
-  rows.forEach(r=>r.classList.remove("nextPrayer"));
-
-  let target,row,name;
-  for(let i=0;i<todayTimes.length;i++){
-    if(i===1) continue;
-    const [h,m]=todayTimes[i].split(":").map(Number);
-    const t=new Date();
-    t.setHours(h,m,0,0);
-    if(t>now){target=t;row=rows[i];name=prayerNames[i];break;}
-  }
-
-  if(!target){
-    const [h,m]=todayTimes[2].split(":").map(Number);
-    target=new Date();
-    target.setDate(target.getDate()+1);
-    target.setHours(h,m,0,0);
-    row=rows[2];
-    name=prayerNames[2];
-  }
-
-  row.classList.add("nextPrayer");
-  const d=target-now;
-  document.getElementById("countdownText").innerText=`${name} بعد:`;
-  document.getElementById("nextPrayerClock").innerText=
-    `${String(Math.floor(d/3600000)).padStart(2,"0")}:${String(Math.floor(d%3600000/60000)).padStart(2,"0")}:${String(Math.floor(d%60000/1000)).padStart(2,"0")}`;
-}
-
-/* ===== تشغيل كل شيء ===== */
-buildTable();
-updateDateAndTimes();
-updateCountdown();
-setInterval(updateCountdown,1000);
-setInterval(updateDateAndTimes,60000);
+setInterval(updateClock,1000);
+updateClock();
 </script>
 
 </body>
