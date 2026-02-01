@@ -216,13 +216,14 @@ function updateCountdown(){
     const [h,m]=todayTimes[i].split(":").map(Number);
     const t=new Date();t.setHours(h,m,0,0);
     if(t>now){target=t;row=rows[i];name=prayerNames[i];break;}
-  }
   if(!target){
-    const [h,m]=todayTimes[2].split(":").map(Number);
-    target=new Date();target.setDate(target.getDate()+1);
-    target.setHours(h,m,0,0);
-    row=rows[2];name=prayerNames[2];
-  }
+  const [h,m]=todayTimes[0].split(":").map(Number); // الفجر
+  target=new Date();
+  target.setDate(target.getDate()+1);
+  target.setHours(h,m,0,0);
+  row=rows[0];
+  name=prayerNames[0];
+}
   row.classList.add("nextPrayer");
   const d=target-now;
   document.getElementById("countdownText").innerText=`${name} بعد:`;
