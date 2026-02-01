@@ -208,27 +208,55 @@ function updateDateAndTimes(){
 }
 
 function updateCountdown(){
-  const now=new Date();
-  rows.forEach(r=>r.classList.remove("nextPrayer"));
-  let target,row,name;
-  for(let i=0;i<todayTimes.length;i++){
-    if(i===1) continue;
-    const [h,m]=todayTimes[i].split(":").map(Number);
-    const t=new Date();t.setHours(h,m,0,0);
-    if(t>now){target=t;row=rows[i];name=prayerNames[i];break;}
+  const now = new Date();
+  rows.forEach(r => r.classList.remove("nextPrayer"));
+
+  let target = null;
+  let row = null;
+  let name = "";
+
+  // 🔹 البحث في صلوات اليوم
+  for(let i = 0; i < todayTimes.length; i++){
+    if(i === 1) continue; // تخطي الإمساك فقط
+
+    const [h,m] = todayTimes[i].split(":").map(Number);
+    const t = new Date();
+    t.setHours(h,m,0,0);
+
+    if(t > now){
+      target = t;
+      row = rows[i];
+      name = prayerNames[i];
+      break;
+    }
+  }
+
+  // 🔹 إن انتهت صلوات اليوم → فجر الغد
   if(!target){
-  const [h,m]=todayTimes[0].split(":").map(Number); // الفجر
-  target=new Date();
-  target.setDate(target.getDate()+1);
-  target.setHours(h,m,0,0);
-  row=rows[0];
-  name=prayerNames[0];
-}
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const diffDays = Math.floor((tomorrow - TABLE_START_DATE) / 86400000);
+    const index = Math.min(Math.max(diffDays,0), prayerSchedule.length-1);
+    const tomorrowTimes = prayerSchedule[index];
+
+    const [h,m] = tomorrowTimes[0].split(":").map(Number); // الفجر
+    target = new Date();
+    target.setDate(target.getDate() + 1);
+    target.setHours(h,m,0,0);
+
+    row = rows[0];
+    name = prayerNames[0];
+  }
+
   row.classList.add("nextPrayer");
-  const d=target-now;
-  document.getElementById("countdownText").innerText=`${name} بعد:`;
-  document.getElementById("nextPrayerClock").innerText=
-    `${String(Math.floor(d/3600000)).padStart(2,"0")}:${String(Math.floor(d%3600000/60000)).padStart(2,"0")}:${String(Math.floor(d%60000/1000)).padStart(2,"0")}`;
+
+  const d = target - now;
+  document.getElementById("countdownText").innerText = `${name} بعد:`;
+  document.getElementById("nextPrayerClock").innerText =
+    `${String(Math.floor(d/3600000)).padStart(2,"0")}:` +
+    `${String(Math.floor(d%3600000/60000)).padStart(2,"0")}:` +
+    `${String(Math.floor(d%60000/1000)).padStart(2,"0")}`;
 }
 
 buildTable();
