@@ -26,13 +26,23 @@ body{
   text-align:center;
   color:white;
 }
-.logo{width:80px;margin-bottom:6px;}
 .title{
   font-size:20px;
   font-weight:700;
   text-shadow:0 0 10px gold;
 }
 .date{margin:5px 0;font-size:17px;font-weight:700}
+
+/* ===== الساعة الرقمية الذهبية ===== */
+#digitalClock {
+  font-size:20px;
+  font-weight:700;
+  margin-top:6px;
+  color:gold;
+  text-shadow:0 0 4px gold,0 0 8px orange,0 0 12px gold;
+  transition:text-shadow 0.3s ease-in-out;
+  font-family:'Cairo',sans-serif;
+}
 
 .table{margin-top:10px}
 .row{
@@ -62,18 +72,19 @@ body{
   justify-content:center;
   gap:6px;
 }
-.footer img{width:20px}
 </style>
 </head>
 
 <body>
 
 <div class="overlay">
-  <img src="logo.png" class="logo">
-  <div class="title">الجمعية الخيرية مسك الختام القرارم قوقة</div>
+
+  <div class="title">الجمعية الخيرية مسك الختام</div>
 
   <div class="date" id="gregorian">--</div>
   <div class="date" id="hijri">--</div>
+
+  <div id="digitalClock">--:--:--</div>
 
   <div id="countdownText">-- بعد:</div>
   <div id="nextPrayerClock">--:--:--</div>
@@ -81,17 +92,13 @@ body{
   <div class="table" id="prayerTable"></div>
 
   <div class="footer">
-    <img src="logo.png">
     <span>misk elkhithem ©</span>
   </div>
 </div>
 
 <script>
-/* ================== بداية جدول المواقيت ================== */
-/* المرجع: الأحد 01 فيفري 2026 */
-
+/* ===== جدول مواقيت الصلاة ===== */
 const TABLE_START_DATE = new Date("2026-02-01T00:00:00");
-
 /* فجر – إمساك – ظهر – عصر – مغرب – عشاء */
 const prayerSchedule = [
   ["06:09","05:59","12:49","15:40","18:04","19:25"], // 01 فيفري
@@ -112,41 +119,41 @@ const prayerSchedule = [
   ["05:56","05:46","12:49","15:52","18:20","19:39"],
   ["05:55","05:45","12:49","15:53","18:21","19:40"]
 ];
-
 const prayerNames=["الفجر","الإمساك","الظهر","العصر","المغرب","العشاء"];
 let rows=[], todayTimes=[];
 
-/* ================== التاريخ الهجري (نهائي) ================== */
-/* الأحد 01 فيفري 2026 = 13 شعبان 1447 */
-
-const HIJRI_START_DATE = new Date("2026-02-01T00:00:00");
-const hijriMonths=[
-  "محرم","صفر","ربيع الأول","ربيع الثاني",
-  "جمادى الأولى","جمادى الآخرة","رجب",
-  "شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"
-];
+/* ===== التاريخ الهجري ===== */
+const HIJRI_START_DATE=new Date("2026-02-01T00:00:00");
+const hijriMonths=["محرم","صفر","ربيع الأول","ربيع الثاني","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"];
 
 function updateHijri(){
   const today=new Date();
   today.setHours(0,0,0,0);
-
-  const diffDays=Math.floor(
-    (today.getTime()-HIJRI_START_DATE.getTime())/86400000
-  );
-
-  let day=13+diffDays,month=7,year=1447;
-
-  while(day>30){
-    day-=30;
-    month++;
-    if(month>11){month=0;year++;}
-  }
-
-  document.getElementById("hijri").innerText=
-    `${day} ${hijriMonths[month]} ${year} هـ`;
+  const diff=Math.floor((today-HIJRI_START_DATE)/86400000);
+  let d=13+diff,m=7,y=1447;
+  while(d>30){d-=30;m++;if(m>11){m=0;y++;}}
+  document.getElementById("hijri").innerText=`${d} ${hijriMonths[m]} ${y} هـ`;
 }
 
-/* ================== بناء الجدول ================== */
+/* ===== الساعة الرقمية الذهبية المتوهجة ===== */
+function updateDigitalClockAdvanced() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, "0");
+  const m = String(now.getMinutes()).padStart(2, "0");
+  const s = String(now.getSeconds()).padStart(2, "0");
+
+  const clockEl = document.getElementById("digitalClock");
+  clockEl.innerText = `${h}:${m}:${s}`;
+
+  const glow = 4 + 3 * Math.sin((now.getSeconds() + now.getMilliseconds()/1000) * Math.PI * 2 / 60);
+  clockEl.style.textShadow = `
+    0 0 ${glow}px gold,
+    0 0 ${glow*2}px orange,
+    0 0 ${glow*3}px gold
+  `;
+}
+
+/* ===== بناء جدول الصلاة ===== */
 function buildTable(){
   const c=document.getElementById("prayerTable");
   c.innerHTML="";
@@ -160,22 +167,20 @@ function buildTable(){
   });
 }
 
-/* ================== تحديث التاريخ والمواقيت ================== */
+/* ===== تحديث التاريخ والمواقيت ===== */
 function updateDateAndTimes(){
   const now=new Date();
   document.getElementById("gregorian").innerText=
     now.toLocaleDateString("ar-DZ",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
-
   updateHijri();
 
   const diffDays=Math.floor((now-TABLE_START_DATE)/86400000);
   const index=Math.min(Math.max(diffDays,0),prayerSchedule.length-1);
-
   todayTimes=prayerSchedule[index];
   todayTimes.forEach((t,i)=>document.getElementById("t"+i).innerText=t);
 }
 
-/* ================== العد التنازلي ================== */
+/* ===== العد التنازلي ===== */
 function updateCountdown(){
   const now=new Date();
   rows.forEach(r=>r.classList.remove("nextPrayer"));
@@ -205,12 +210,14 @@ function updateCountdown(){
     `${String(Math.floor(d/3600000)).padStart(2,"0")}:${String(Math.floor(d%3600000/60000)).padStart(2,"0")}:${String(Math.floor(d%60000/1000)).padStart(2,"0")}`;
 }
 
-/* ================== تشغيل ================== */
+/* ===== تشغيل كل شيء ===== */
 buildTable();
 updateDateAndTimes();
 updateCountdown();
+updateDigitalClockAdvanced();
 setInterval(updateCountdown,1000);
 setInterval(updateDateAndTimes,60000);
+setInterval(updateDigitalClockAdvanced,100);
 </script>
 
 </body>
