@@ -270,6 +270,21 @@ updateDateAndTimes();
 updateCountdown();
 setInterval(updateCountdown,1000);
 setInterval(updateDateAndTimes,60000);
+function updateBackground(){
+  const now = new Date();
+  const hour = now.getHours();
+
+  // من 19:00 إلى 07:00 → ليل
+  if(hour >= 19 || hour < 7){
+    document.body.style.backgroundImage = 'url("background1.png")';
+  }
+  // من 07:00 إلى 19:00 → نهار
+  else{
+    document.body.style.backgroundImage = 'url("background3.png")';
+  }
+}
+updateBackground();
+setInterval(updateBackground, 60000); // تحديث كل دقيقة
 </script>
 
 </body>
