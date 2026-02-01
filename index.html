@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>مواقيت الصلاة - ميلة</title>
 
+<!-- ===== Open Graph لجعل الرابط يظهر بالصورة على فيسبوك ===== -->
+<meta property="og:title" content="مواقيت الصلاة - ميلة" />
+<meta property="og:description" content="تابع مواقيت الصلاة اليومية مع العد التنازلي." />
+<meta property="og:image" content="https://i.ibb.co/YTdqZrH/background1.png" /> <!-- رابط مباشر لخلفية -->
+<meta property="og:url" content="https://i.ibb.co/3Msmq9F/prayer.html" /> <!-- رابط مباشر للصفحة -->
+<meta property="og:type" content="website" />
+
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
@@ -14,13 +21,13 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  background:url("background1.png") no-repeat center center fixed;
+  background:url("https://i.ibb.co/YTdqZrH/background1.png") no-repeat center center fixed;
   background-size:cover;
 }
 .overlay{
   width:95%;
   max-width:420px;
-  background:rgba(0,0,0,0.0);
+  background:rgba(0,0,0,0.45);
   border-radius:18px;
   padding:15px;
   text-align:center;
@@ -28,10 +35,7 @@ body{
   transform: scale(0.9);
   transform-origin: center top;
 }
-
 .logo{width:80px;margin-bottom:6px;}
-
-/* 🔽 تم تقريب السطور هنا فقط */
 .title{
   font-size:20px;
   font-weight:700;
@@ -43,7 +47,6 @@ body{
   font-size:14px;
   font-weight:700;
 }
-
 .table{margin-top:10px}
 .row{
   display:flex;
@@ -57,10 +60,8 @@ body{
   color:black;
   border-radius:12px;
 }
-
-/* ===== العد التنازلي ===== */
 #countdownText{
-  font-size:24px;      /* ← حجم جملة: العصر بعد */
+  font-size:24px;
   font-weight:700;
   margin:6px 0;
   color:gold;
@@ -81,8 +82,6 @@ body{
   width:35px;
   height:35px;
 }
-
-/* ===== شريط الأخبار ===== */
 #newsTicker{
   width:100%;
   overflow:hidden;
@@ -106,7 +105,6 @@ body{
   0%{left:-100%;}
   100%{left:100%;}
 }
-
 .footer{
   margin-top:10px;
   font-size:14px;
@@ -120,35 +118,26 @@ body{
 <body>
 
 <div class="overlay">
-
-  <img src="logo.png" class="logo" alt="لوغو الجمعية">
-
+  <img src="https://i.ibb.co/kxvGqvX/logo.png" class="logo" alt="لوغو الجمعية">
   <div id="newsTicker">
-    <span>
-🌙تذكير بصيام أيام البيض التي تبدأ من يوم غد الاحد 01 فيفري الى غاية يوم الثلاثاء 03 فيفري 2026🌙الجمعية الخيرية مسك الختام القرارم قوقة
-    </span>
+    <span>🌙تذكير بصيام أيام البيض من يوم غد الاحد 01 فيفري إلى يوم الثلاثاء 03 فيفري 2026🌙</span>
   </div>
-
   <div class="title">الجمعية الخيرية مسك الختام القرارم قوقة</div>
-
   <div class="date" id="gregorian">--</div>
   <div class="date" id="hijri">--</div>
-
   <div id="countdownText">-- بعد:</div>
   <div id="nextPrayerClockContainer">
-    <img src="logo.webp" alt="جرس">
+    <img src="https://i.ibb.co/tXfJ5tF/logo.webp" alt="جرس">
     <div id="nextPrayerClock">--:--:--</div>
   </div>
-
   <div class="table" id="prayerTable"></div>
-
   <div class="footer">
     <span>misk elkhithem ©</span>
   </div>
-
 </div>
 
 <script>
+// جدول الصلوات والعد التنازلي كما في النسخة السابقة
 const TABLE_START_DATE = new Date("2026-02-01T00:00:00");
 const prayerSchedule = [
   ["06:09","05:59","12:49","15:40","18:04","19:25"],
