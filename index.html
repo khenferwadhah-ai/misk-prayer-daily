@@ -87,14 +87,15 @@ body{
 </div>
 
 <script>
-/* ========= تاريخ بداية الجدول ========= */
-const TABLE_START_DATE = new Date("2026-02-01");
+/* ================== بداية جدول المواقيت ================== */
+/* المرجع: الأحد 01 فيفري 2026 */
 
-/* ========= جدول المواقيت بالترتيب ========= */
+const TABLE_START_DATE = new Date("2026-02-01T00:00:00");
+
 /* فجر – إمساك – ظهر – عصر – مغرب – عشاء */
 const prayerSchedule = [
-  ["06:09","05:59","12:49","15:40","18:04","19:25"], // 1 فيفري
-  ["06:08","05:58","12:49","15:41","18:05","19:26"], // 2
+  ["06:09","05:59","12:49","15:40","18:04","19:25"], // 01 فيفري
+  ["06:08","05:58","12:49","15:41","18:05","19:26"],
   ["06:07","05:57","12:49","15:42","18:07","19:27"],
   ["06:07","05:57","12:49","15:42","18:08","19:27"],
   ["06:06","05:56","12:49","15:43","18:09","19:28"],
@@ -115,19 +116,37 @@ const prayerSchedule = [
 const prayerNames=["الفجر","الإمساك","الظهر","العصر","المغرب","العشاء"];
 let rows=[], todayTimes=[];
 
-/* ========= التاريخ الهجري (تقريبي) ========= */
-const hijriStart=new Date("2026-01-31"); // 13 شعبان
-const hijriMonths=["محرم","صفر","ربيع الأول","ربيع الثاني","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"];
+/* ================== التاريخ الهجري (نهائي) ================== */
+/* الأحد 01 فيفري 2026 = 13 شعبان 1447 */
+
+const HIJRI_START_DATE = new Date("2026-02-01T00:00:00");
+const hijriMonths=[
+  "محرم","صفر","ربيع الأول","ربيع الثاني",
+  "جمادى الأولى","جمادى الآخرة","رجب",
+  "شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"
+];
 
 function updateHijri(){
-  const now=new Date();
-  let d=Math.floor((now-hijriStart)/86400000)+13;
-  let m=7,y=1447;
-  while(d>30){d-=30;m++;if(m>11){m=0;y++;}}
-  document.getElementById("hijri").innerText=`${d} ${hijriMonths[m]} ${y} هـ`;
+  const today=new Date();
+  today.setHours(0,0,0,0);
+
+  const diffDays=Math.floor(
+    (today.getTime()-HIJRI_START_DATE.getTime())/86400000
+  );
+
+  let day=13+diffDays,month=7,year=1447;
+
+  while(day>30){
+    day-=30;
+    month++;
+    if(month>11){month=0;year++;}
+  }
+
+  document.getElementById("hijri").innerText=
+    `${day} ${hijriMonths[month]} ${year} هـ`;
 }
 
-/* ========= بناء الجدول ========= */
+/* ================== بناء الجدول ================== */
 function buildTable(){
   const c=document.getElementById("prayerTable");
   c.innerHTML="";
@@ -141,21 +160,22 @@ function buildTable(){
   });
 }
 
-/* ========= جلب مواقيت اليوم حسب الفرق ========= */
+/* ================== تحديث التاريخ والمواقيت ================== */
 function updateDateAndTimes(){
   const now=new Date();
   document.getElementById("gregorian").innerText=
     now.toLocaleDateString("ar-DZ",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+
   updateHijri();
 
-  const diffDays=Math.floor((now - TABLE_START_DATE)/86400000);
+  const diffDays=Math.floor((now-TABLE_START_DATE)/86400000);
   const index=Math.min(Math.max(diffDays,0),prayerSchedule.length-1);
 
   todayTimes=prayerSchedule[index];
   todayTimes.forEach((t,i)=>document.getElementById("t"+i).innerText=t);
 }
 
-/* ========= العد التنازلي ========= */
+/* ================== العد التنازلي ================== */
 function updateCountdown(){
   const now=new Date();
   rows.forEach(r=>r.classList.remove("nextPrayer"));
@@ -185,7 +205,7 @@ function updateCountdown(){
     `${String(Math.floor(d/3600000)).padStart(2,"0")}:${String(Math.floor(d%3600000/60000)).padStart(2,"0")}:${String(Math.floor(d%60000/1000)).padStart(2,"0")}`;
 }
 
-/* ========= تشغيل ========= */
+/* ================== تشغيل ================== */
 buildTable();
 updateDateAndTimes();
 updateCountdown();
