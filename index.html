@@ -25,18 +25,24 @@ body{
   padding:15px;
   text-align:center;
   color:white;
-
-  /* تصغير اللوحة */
   transform: scale(0.9);
   transform-origin: center top;
 }
-.logo{width:80px;margin-bottom:6px;} /* لوغو الجمعية */
+
+.logo{width:80px;margin-bottom:6px;}
+
+/* 🔽 تم تقريب السطور هنا فقط */
 .title{
   font-size:20px;
   font-weight:700;
   text-shadow:0 0 10px gold;
+  margin-bottom:2px;
 }
-.date{margin:5px 0;font-size:17px;font-weight:700}
+.date{
+  margin:2px 0;
+  font-size:17px;
+  font-weight:700;
+}
 
 .table{margin-top:10px}
 .row{
@@ -52,8 +58,8 @@ body{
   border-radius:8px;
 }
 
-/* ===== العد التنازلي مع اللوغو ===== */
-#nextPrayerClockContainer {
+/* ===== العد التنازلي ===== */
+#nextPrayerClockContainer{
   border:2px solid gold;
   border-radius:10px;
   padding:6px 12px;
@@ -63,20 +69,17 @@ body{
   justify-content:center;
   gap:8px;
 }
-#nextPrayerClock{
-  font-size:30px;
-}
+#nextPrayerClock{font-size:30px;}
 #nextPrayerClockContainer img{
   width:35px;
   height:35px;
 }
 
-/* ===== النص المتحرك من اليسار إلى اليمين ===== */
+/* ===== شريط الأخبار ===== */
 #newsTicker{
   width:100%;
   overflow:hidden;
   white-space:nowrap;
-  box-sizing:border-box;
   border-radius:8px;
   margin:5px 0 10px 0;
   background:rgba(255,215,0,0.1);
@@ -111,12 +114,14 @@ body{
 
 <div class="overlay">
 
-  <!-- لوغو الجمعية -->
   <img src="logo.png" class="logo" alt="لوغو الجمعية">
 
-  <!-- نص متحرك إخباري -->
   <div id="newsTicker">
-    <span>تذكير بصيام أيام البيض التي تبدأ من يوم غد الاحد 01 فيفري الى غاية يوم الثلاثاء 03 فيفري 2026 الجمعية الخيرية مسك الختام القرارم قوقة</span>
+    <span>
+      تذكير بصيام أيام البيض التي تبدأ من يوم غد الاحد 01 فيفري
+      الى غاية يوم الثلاثاء 03 فيفري 2026
+      الجمعية الخيرية مسك الختام القرارم قوقة
+    </span>
   </div>
 
   <div class="title">الجمعية الخيرية مسك الختام القرارم قوقة</div>
@@ -135,10 +140,10 @@ body{
   <div class="footer">
     <span>misk elkhithem ©</span>
   </div>
+
 </div>
 
 <script>
-/* ===== جدول مواقيت الصلاة ===== */
 const TABLE_START_DATE = new Date("2026-02-01T00:00:00");
 const prayerSchedule = [
   ["06:09","05:59","12:49","15:40","18:04","19:25"],
@@ -162,20 +167,17 @@ const prayerSchedule = [
 const prayerNames=["الفجر","الإمساك","الظهر","العصر","المغرب","العشاء"];
 let rows=[], todayTimes=[];
 
-/* ===== التاريخ الهجري ===== */
 const HIJRI_START_DATE=new Date("2026-02-01T00:00:00");
 const hijriMonths=["محرم","صفر","ربيع الأول","ربيع الثاني","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"];
 
 function updateHijri(){
-  const today=new Date();
-  today.setHours(0,0,0,0);
+  const today=new Date();today.setHours(0,0,0,0);
   const diff=Math.floor((today-HIJRI_START_DATE)/86400000);
   let d=13+diff,m=7,y=1447;
   while(d>30){d-=30;m++;if(m>11){m=0;y++;}}
   document.getElementById("hijri").innerText=`${d} ${hijriMonths[m]} ${y} هـ`;
 }
 
-/* ===== بناء جدول الصلاة ===== */
 function buildTable(){
   const c=document.getElementById("prayerTable");
   c.innerHTML="";
@@ -189,42 +191,33 @@ function buildTable(){
   });
 }
 
-/* ===== تحديث التاريخ والمواقيت ===== */
 function updateDateAndTimes(){
   const now=new Date();
   document.getElementById("gregorian").innerText=
     now.toLocaleDateString("ar-DZ",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
   updateHijri();
-
   const diffDays=Math.floor((now-TABLE_START_DATE)/86400000);
   const index=Math.min(Math.max(diffDays,0),prayerSchedule.length-1);
   todayTimes=prayerSchedule[index];
   todayTimes.forEach((t,i)=>document.getElementById("t"+i).innerText=t);
 }
 
-/* ===== العد التنازلي ===== */
 function updateCountdown(){
   const now=new Date();
   rows.forEach(r=>r.classList.remove("nextPrayer"));
-
   let target,row,name;
   for(let i=0;i<todayTimes.length;i++){
     if(i===1) continue;
     const [h,m]=todayTimes[i].split(":").map(Number);
-    const t=new Date();
-    t.setHours(h,m,0,0);
+    const t=new Date();t.setHours(h,m,0,0);
     if(t>now){target=t;row=rows[i];name=prayerNames[i];break;}
   }
-
   if(!target){
     const [h,m]=todayTimes[2].split(":").map(Number);
-    target=new Date();
-    target.setDate(target.getDate()+1);
+    target=new Date();target.setDate(target.getDate()+1);
     target.setHours(h,m,0,0);
-    row=rows[2];
-    name=prayerNames[2];
+    row=rows[2];name=prayerNames[2];
   }
-
   row.classList.add("nextPrayer");
   const d=target-now;
   document.getElementById("countdownText").innerText=`${name} بعد:`;
@@ -232,7 +225,6 @@ function updateCountdown(){
     `${String(Math.floor(d/3600000)).padStart(2,"0")}:${String(Math.floor(d%3600000/60000)).padStart(2,"0")}:${String(Math.floor(d%60000/1000)).padStart(2,"0")}`;
 }
 
-/* ===== تشغيل كل شيء ===== */
 buildTable();
 updateDateAndTimes();
 updateCountdown();
