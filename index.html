@@ -32,7 +32,7 @@ body{
 
 .logo{width:80px;margin-bottom:6px;}
 
-/* 🔽 العناوين */
+/* 🔽 تم تقريب السطور هنا فقط */
 .title{
   font-size:20px;
   font-weight:700;
@@ -61,7 +61,7 @@ body{
 
 /* ===== العد التنازلي ===== */
 #countdownText{
-  font-size:24px;
+  font-size:24px;      /* ← حجم جملة: العصر بعد */
   font-weight:700;
   margin:6px 0;
   color:gold;
@@ -83,7 +83,7 @@ body{
   height:35px;
 }
 
-/* ===== شريط الأخبار مع روابط ===== */
+/* ===== شريط الأخبار ===== */
 #newsTicker{
   width:100%;
   overflow:hidden;
@@ -102,11 +102,6 @@ body{
   position:relative;
   left:-100%;
   animation:scrollLeft 20s linear infinite;
-}
-#newsTicker a{
-  color:gold;
-  text-decoration:none;
-  margin:0 10px;
 }
 @keyframes scrollLeft{
   0%{left:-100%;}
@@ -129,18 +124,13 @@ body{
 
   <img src="logo.png" class="logo" alt="لوغو الجمعية">
 
-  <!-- شريط الأخبار -->
   <div id="newsTicker">
     <span>
-      <a href="news1.html" target="_blank">🌙 خبر كتابي 1</a> 
-      | 
-      <a href="news2.html" target="_blank">📖 خبر كتابي 2</a> 
-      | 
-      <a href="news3.html" target="_blank">📰 خبر كتابي 3</a>
+🌙تذكير بصيام أيام البيض التي تبدأ من يوم غد الاحد 01 فيفري الى غاية يوم الثلاثاء 03 فيفري 2026🌙الجمعية الخيرية مسك الختام القرارم قوقة
     </span>
   </div>
 
-  <div class="title">(ٱلْجَمْعِيَّةُ ٱلْخَيْرِيَّةُ مِسْكُ ٱلْخِتَامِ ٱلْقَرَارِمِ قُوقَة)</div>
+  <div class="title">الجمعية الخيرية مسك الختام القرارم قوقة</div>
 
   <div class="date" id="gregorian">--</div>
   <div class="date" id="hijri">--</div>
@@ -160,7 +150,6 @@ body{
 </div>
 
 <script>
-// ===== بيانات مواقيت الصلاة =====
 const TABLE_START_DATE = new Date("2026-02-01T00:00:00");
 const prayerSchedule = [
   ["06:09","05:59","12:49","15:40","18:04","19:25"],
@@ -184,19 +173,17 @@ const prayerSchedule = [
 const prayerNames=["الفجر","الإمساك","الظهر","العصر","المغرب","العشاء"];
 let rows=[], todayTimes=[];
 
-// ===== التاريخ الهجري =====
 const HIJRI_START_DATE=new Date("2026-02-01T00:00:00");
 const hijriMonths=["محرم","صفر","ربيع الأول","ربيع الثاني","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"];
 
 function updateHijri(){
-  const today=new Date(); today.setHours(0,0,0,0);
+  const today=new Date();today.setHours(0,0,0,0);
   const diff=Math.floor((today-HIJRI_START_DATE)/86400000);
   let d=13+diff,m=7,y=1447;
   while(d>30){d-=30;m++;if(m>11){m=0;y++;}}
   document.getElementById("hijri").innerText=`${d} ${hijriMonths[m]} ${y} هـ`;
 }
 
-// ===== بناء جدول المواقيت =====
 function buildTable(){
   const c=document.getElementById("prayerTable");
   c.innerHTML="";
@@ -210,7 +197,6 @@ function buildTable(){
   });
 }
 
-// ===== تحديث التاريخ والوقت =====
 function updateDateAndTimes(){
   const now=new Date();
   document.getElementById("gregorian").innerText=
@@ -222,61 +208,83 @@ function updateDateAndTimes(){
   todayTimes.forEach((t,i)=>document.getElementById("t"+i).innerText=t);
 }
 
-// ===== العد التنازلي للصلاة القادمة =====
+
+
+buildTable();
 function updateCountdown(){
   if(!todayTimes.length) return;
+
   const now = new Date();
   rows.forEach(r => r.classList.remove("nextPrayer"));
-  let target = null, index = -1;
 
+  let target = null;
+  let index = -1;
+
+  // 🔹 البحث عن الصلاة القادمة (تخطي الإمساك فقط)
   for(let i = 0; i < todayTimes.length; i++){
-    if(i === 1) continue; // تخطي الإمساك
+    if(i === 1) continue; // الإمساك
+
     const [h,m] = todayTimes[i].split(":").map(Number);
-    const t = new Date(); t.setHours(h,m,0,0);
-    if(t > now){target=t; index=i; break;}
+    const t = new Date();
+    t.setHours(h,m,0,0);
+
+    if(t > now){
+      target = t;
+      index = i;
+      break;
+    }
   }
 
+  // 🔹 بعد العشاء → فجر الغد
   if(!target){
-    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
-    const diffDays = Math.floor((tomorrow-TABLE_START_DATE)/86400000);
-    const tableIndex = Math.min(Math.max(diffDays,0),prayerSchedule.length-1);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const diffDays = Math.floor((tomorrow - TABLE_START_DATE) / 86400000);
+    const tableIndex = Math.min(Math.max(diffDays,0), prayerSchedule.length-1);
     const tomorrowTimes = prayerSchedule[tableIndex];
+
     const [h,m] = tomorrowTimes[0].split(":").map(Number);
-    target = new Date(); target.setDate(target.getDate()+1); target.setHours(h,m,0,0);
-    index=0;
+    target = new Date();
+    target.setDate(target.getDate() + 1);
+    target.setHours(h,m,0,0);
+
+    index = 0;
   }
 
+  // 🔹 تمييز الصلاة القادمة
   rows[index].classList.add("nextPrayer");
-  const diff = target-now;
+
+  const diff = target - now;
   if(diff <= 0) return;
 
-  document.getElementById("countdownText").innerText = `${prayerNames[index]} بعد:`;
+  document.getElementById("countdownText").innerText =
+    `${prayerNames[index]} بعد:`;
+
   document.getElementById("nextPrayerClock").innerText =
-    `${String(Math.floor(diff/3600000)).padStart(2,"0")}:`+
-    `${String(Math.floor(diff%3600000/60000)).padStart(2,"0")}:`+
+    `${String(Math.floor(diff/3600000)).padStart(2,"0")}:` +
+    `${String(Math.floor(diff%3600000/60000)).padStart(2,"0")}:` +
     `${String(Math.floor(diff%60000/1000)).padStart(2,"0")}`;
 }
-
-// ===== تبديل الخلفية نهار / ليل =====
+updateDateAndTimes();
+updateCountdown();
+setInterval(updateCountdown,1000);
+setInterval(updateDateAndTimes,60000);
 function updateBackground(){
   const now = new Date();
   const hour = now.getHours();
-  if(hour >= 19 || hour < 7){ // 7 مساءً → 7 صباحًا
+
+  // من 19:00 إلى 07:00 → ليل
+  if(hour >= 19 || hour < 7){
     document.body.style.backgroundImage = 'url("background1.png")';
-  } else { // 7 صباحًا → 7 مساءً
+  }
+  // من 07:00 إلى 19:00 → نهار
+  else{
     document.body.style.backgroundImage = 'url("background3.png")';
   }
 }
-
-// ===== التشغيل =====
-buildTable();
-updateDateAndTimes();
-updateCountdown();
 updateBackground();
-
-setInterval(updateCountdown,1000);
-setInterval(updateDateAndTimes,60000);
-setInterval(updateBackground,60000);
+setInterval(updateBackground, 60000); // تحديث كل دقيقة
 </script>
 
 </body>
