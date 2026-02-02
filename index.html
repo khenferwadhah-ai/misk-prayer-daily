@@ -14,9 +14,8 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  background:no-repeat center center fixed;
+  background:url("background1.png") no-repeat center center fixed;
   background-size:cover;
-  transition: background-image 1.5s ease-in-out;
 }
 .overlay{
   width:95%;
@@ -208,83 +207,34 @@ function updateDateAndTimes(){
   todayTimes.forEach((t,i)=>document.getElementById("t"+i).innerText=t);
 }
 
-
+function updateCountdown(){
+  const now=new Date();
+  rows.forEach(r=>r.classList.remove("nextPrayer"));
+  let target,row,name;
+  for(let i=0;i<todayTimes.length;i++){
+    if(i===1) continue;
+    const [h,m]=todayTimes[i].split(":").map(Number);
+    const t=new Date();t.setHours(h,m,0,0);
+    if(t>now){target=t;row=rows[i];name=prayerNames[i];break;}
+  }
+  if(!target){
+    const [h,m]=todayTimes[2].split(":").map(Number);
+    target=new Date();target.setDate(target.getDate()+1);
+    target.setHours(h,m,0,0);
+    row=rows[2];name=prayerNames[2];
+  }
+  row.classList.add("nextPrayer");
+  const d=target-now;
+  document.getElementById("countdownText").innerText=`${name} بعد:`;
+  document.getElementById("nextPrayerClock").innerText=
+    `${String(Math.floor(d/3600000)).padStart(2,"0")}:${String(Math.floor(d%3600000/60000)).padStart(2,"0")}:${String(Math.floor(d%60000/1000)).padStart(2,"0")}`;
+}
 
 buildTable();
-function updateCountdown(){
-  if(!todayTimes.length) return;
-
-  const now = new Date();
-  rows.forEach(r => r.classList.remove("nextPrayer"));
-
-  let target = null;
-  let index = -1;
-
-  // 🔹 البحث عن الصلاة القادمة (تخطي الإمساك فقط)
-  for(let i = 0; i < todayTimes.length; i++){
-    if(i === 1) continue; // الإمساك
-
-    const [h,m] = todayTimes[i].split(":").map(Number);
-    const t = new Date();
-    t.setHours(h,m,0,0);
-
-    if(t > now){
-      target = t;
-      index = i;
-      break;
-    }
-  }
-
-  // 🔹 بعد العشاء → فجر الغد
-  if(!target){
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const diffDays = Math.floor((tomorrow - TABLE_START_DATE) / 86400000);
-    const tableIndex = Math.min(Math.max(diffDays,0), prayerSchedule.length-1);
-    const tomorrowTimes = prayerSchedule[tableIndex];
-
-    const [h,m] = tomorrowTimes[0].split(":").map(Number);
-    target = new Date();
-    target.setDate(target.getDate() + 1);
-    target.setHours(h,m,0,0);
-
-    index = 0;
-  }
-
-  // 🔹 تمييز الصلاة القادمة
-  rows[index].classList.add("nextPrayer");
-
-  const diff = target - now;
-  if(diff <= 0) return;
-
-  document.getElementById("countdownText").innerText =
-    `${prayerNames[index]} بعد:`;
-
-  document.getElementById("nextPrayerClock").innerText =
-    `${String(Math.floor(diff/3600000)).padStart(2,"0")}:` +
-    `${String(Math.floor(diff%3600000/60000)).padStart(2,"0")}:` +
-    `${String(Math.floor(diff%60000/1000)).padStart(2,"0")}`;
-}
 updateDateAndTimes();
 updateCountdown();
 setInterval(updateCountdown,1000);
 setInterval(updateDateAndTimes,60000);
-function updateBackground(){
-  const now = new Date();
-  const hour = now.getHours();
-
-  // من 19:00 إلى 07:00 → ليل
-  if(hour >= 19 || hour < 7){
-    document.body.style.backgroundImage = 'url("background1.png")';
-  }
-  // من 07:00 إلى 19:00 → نهار
-  else{
-    document.body.style.backgroundImage = 'url("background3.png")';
-  }
-}
-updateBackground();
-setInterval(updateBackground, 60000); // تحديث كل دقيقة
 </script>
 
 </body>
