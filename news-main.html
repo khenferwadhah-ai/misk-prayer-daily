@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>أخبار مسك الختام</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',Tahoma;}
 body{background:#000;color:#fff;min-height:100vh;}
@@ -14,7 +12,7 @@ a{text-decoration:none;color:inherit;}
 
 /* ===== الهيدر ===== */
 .header{
-  position: relative;
+  position:relative;
   display:flex;
   flex-direction:column;
   padding:15px;
@@ -31,8 +29,7 @@ a{text-decoration:none;color:inherit;}
   display:flex;
   flex-direction:column;
   justify-content:flex-start;
-  align-items:flex-start;
-  gap:6px;
+  gap:4px;
   position:relative;
 }
 .header-left .main-title{
@@ -40,15 +37,11 @@ a{text-decoration:none;color:inherit;}
   font-weight:900;
   font-size:28px;
   line-height:1.1;
-  position:relative;
-  padding-left:20px;
 }
 .header-left .main-title span{display:block;}
 .header-left .subtitle-small{
   color:#fff;
   font-size:14px;
-  position:relative;
-  padding-left:20px;
 }
 .header-left::after{
   content:"";
@@ -68,49 +61,61 @@ a{text-decoration:none;color:inherit;}
 .header-bottom{
   text-align:center;
   color:gold;
-  font-size:10px;
+  font-size:12px;
   font-weight:700;
-  margin-top:15px;
+  margin-top:10px;
 }
 
 /* ===== أقسام الأخبار ===== */
-.sections {
-  display: flex;
-  flex-wrap: nowrap; /* كل الأزرار في سطر واحد */
-  gap: 8px;
-  justify-content: center;
-  padding: 10px 15px;
-  overflow-x: auto; /* شريط تمرير أفقي إذا لزم */
+.sections{
+  display:flex;
+  justify-content:center;
+  flex-wrap:nowrap;
+  gap:8px;
+  padding:15px;
+  overflow-x:auto;
 }
-.section-btn {
-  background: #111;
-  border: 2px solid gold;
-  color: #fff;
-  padding: 8px 12px; /* تصغير الحشو */
-  font-size: 13px;   /* تصغير الخط */
-  font-weight: 700;
-  border-radius: 8px; /* تصغير الحواف */
-  cursor: pointer;
-  transition: 0.3s;
-  white-space: nowrap;
+.section-btn{
+  background:#111;
+  border:2px solid gold;
+  color:#fff;
+  padding:10px 12px;
+  font-size:13px;
+  font-weight:700;
+  border-radius:8px;
+  cursor:pointer;
+  flex-shrink:0;
+  transition:0.3s;
 }
-.section-btn:hover {background: gold; color: #000;}
+.section-btn:hover{background:gold;color:#000;}
 
-/* ===== الأخبار ===== */
-.news-container{padding:15px;display:flex;flex-direction:column;gap:12px;}
-.news-box{
-  background:#111;border:1px solid gold;border-radius:12px;
-  padding:15px;display:none;flex-direction:column;gap:8px;
+/* ===== عرض الأخبار ===== */
+.news-container{
+  padding:15px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
 }
-.news-title{font-size:22px;font-weight:900;color:gold;}
+.news-box{
+  background:#111;
+  border:1px solid gold;
+  border-radius:12px;
+  padding:15px;
+  display:none;
+  flex-direction:column;
+  gap:8px;
+}
+.news-title{font-size:20px;font-weight:900;color:gold;}
 .news-meta{font-size:13px;opacity:0.8;}
-.news-text{font-size:17px;line-height:1.8;}
+.news-text{font-size:16px;line-height:1.6;}
 
 @media(max-width:400px){
   .header-left .main-title{font-size:22px;}
-  .news-title{font-size:20px;}
-  .news-text{font-size:16px;}
+  .news-title{font-size:18px;}
+  .news-text{font-size:15px;}
   .header-right img{width:80px;}
+  .sections{gap:6px;padding:10px;}
+  .section-btn{font-size:12px;padding:8px 10px;}
 }
 </style>
 </head>
