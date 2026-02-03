@@ -26,46 +26,49 @@ a{text-decoration:none;color:inherit;}
   justify-content:space-between;
   align-items:flex-start;
 }
-.header-left img{
-  width:100px;
-  height:auto;
-  object-fit:contain;
-}
-.header-right{
+.header-left{
   text-align:left;
   display:flex;
   flex-direction:column;
   justify-content:flex-start;
-  align-items:flex-end;
+  align-items:flex-start;
   gap:6px;
   position:relative;
 }
-.header-right .main-title{
+.header-left .main-title{
   color:#fff;
   font-weight:900;
   font-size:28px;
   line-height:1.1;
   position:relative;
-  padding-right:20px;
+  padding-left:20px;
 }
-.header-right .main-title span{
+.header-left .main-title span{
   display:block;
 }
-.header-right .subtitle-small{
+.header-left .subtitle-small{
   color:#fff;
   font-size:14px;
   position:relative;
-  padding-right:20px;
+  padding-left:20px;
 }
 /* الخط الأبيض على يمين العنوانين */
-.header-right::after{
+.header-left::after{
   content:"";
   position:absolute;
   top:0;
-  right:0;
+  left:100%;
   width:2px;
   height:100%;
   background:#fff;
+  margin-left:10px;
+}
+
+/* اللوغو على اليمين */
+.header-right img{
+  width:100px;
+  height:auto;
+  object-fit:contain;
 }
 
 /* العنوان الذهبي في أسفل الهيدر */
@@ -101,10 +104,10 @@ a{text-decoration:none;color:inherit;}
 .news-text{font-size:17px;line-height:1.8;}
 
 @media(max-width:400px){
-  .header-right .main-title{font-size:22px;}
+  .header-left .main-title{font-size:22px;}
   .news-title{font-size:20px;}
   .news-text{font-size:16px;}
-  .header-left img{width:80px;}
+  .header-right img{width:80px;}
 }
 </style>
 </head>
@@ -113,14 +116,14 @@ a{text-decoration:none;color:inherit;}
 <div class="header">
   <div class="header-top">
     <div class="header-left">
-      <img src="logo1.png" alt="لوغو الجمعية">
-    </div>
-    <div class="header-right">
       <div class="main-title">
         <span>أخبار</span>
         <span>مسك الختام</span>
       </div>
       <div class="subtitle-small">MISK-ELKHITHEM</div>
+    </div>
+    <div class="header-right">
+      <img src="logo1.png" alt="لوغو الجمعية">
     </div>
   </div>
   <div class="header-bottom">الجمعية الخيرية مسك الختام القرارم قوقة</div>
