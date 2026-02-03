@@ -8,59 +8,40 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 
 <style>
-/* ===== إعدادات عامة ===== */
-* { margin:0; padding:0; box-sizing:border-box; font-family:'Cairo',Tahoma; }
-body { background:#000; color:#fff; min-height:100vh; }
-a { text-decoration:none; color:inherit; }
-
-/* ===== العنوان ===== */
-.header { text-align:center; padding:25px 15px; border-bottom:2px solid gold; }
-.header h1 { font-size:28px; font-weight:900; color:gold; margin-bottom:8px; }
-.logo-holder { font-size:14px; opacity:0.6; }
-
-/* ===== أقسام الأخبار ===== */
-.sections {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-  gap:10px;
-  padding:15px;
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',Tahoma;}
+body{background:#000;color:#fff;min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+.header{text-align:center;padding:25px 15px;border-bottom:2px solid gold;}
+.header h1{font-size:30px;font-weight:900;color:gold;margin-bottom:8px;}
+.logo-holder{font-size:14px;opacity:0.6;margin-bottom:10px;}
+.sections{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:15px;}
+.section-btn{
+  background:#111;border:2px solid gold;color:#fff;
+  padding:14px 12px;font-size:15px;font-weight:700;
+  border-radius:10px;cursor:pointer;transition:0.3s;
 }
-.section-btn {
-  background:#111;
-  border:2px solid gold;
-  color:#fff;
-  padding:14px 8px;
-  font-size:15px;
-  font-weight:700;
-  border-radius:10px;
-  cursor:pointer;
-  transition:0.3s;
+.section-btn:hover{background:gold;color:#000;}
+.news-container{padding:15px;display:flex;flex-direction:column;gap:12px;}
+.news-box{
+  background:#111;border:1px solid gold;border-radius:12px;
+  padding:15px;display:none;flex-direction:column;gap:8px;
 }
-.section-btn:hover { background:gold; color:#000; }
-
-/* ===== صندوق الخبر ===== */
-.news-box {
-  margin:15px;
-  padding:15px;
-  border-radius:12px;
-  background:#111;
-  border:1px solid gold;
-  display:none;
+.news-title{font-size:22px;font-weight:900;color:gold;}
+.news-meta{font-size:13px;opacity:0.8;}
+.news-text{font-size:17px;line-height:1.8;}
+@media(max-width:400px){
+  .news-title{font-size:20px;}
+  .news-text{font-size:16px;}
 }
-.news-title { font-size:20px; font-weight:900; margin-bottom:6px; color:gold; }
-.news-meta { font-size:13px; margin-bottom:10px; opacity:0.8; }
-.news-text { font-size:17px; line-height:1.8; }
 </style>
 </head>
 <body>
 
-<!-- ===== العنوان ===== -->
 <div class="header">
   <h1>أخبار مسك الختام</h1>
   <div class="logo-holder">مكان إضافة لوغو الجمعية لاحقًا</div>
 </div>
 
-<!-- ===== أقسام الأخبار ===== -->
 <div class="sections">
   <button class="section-btn" onclick="showNews('news')">أخبار</button>
   <button class="section-btn" onclick="showNews('activities')">نشاطات الجمعية</button>
@@ -69,51 +50,47 @@ a { text-decoration:none; color:inherit; }
   <button class="section-btn" onclick="showNews('ramadan')">قفة رمضان</button>
 </div>
 
-<!-- ===== صندوق عرض الخبر ===== -->
-<div class="news-box" id="newsBox">
-  <div class="news-title" id="newsTitle"></div>
-  <div class="news-meta" id="newsMeta"></div>
-  <div class="news-text" id="newsText"></div>
-</div>
+<div class="news-container" id="newsContainer"></div>
 
 <script>
-/* ===== بيانات الأخبار التجريبية ===== */
+/* ===== بيانات الأخبار المطورة ===== */
 const newsData = {
-  news:{
-    title:"إعلان هام للجمعية",
-    text:"تعلم الجمعية الخيرية مسك الختام كافة المواطنين بآخر المستجدات المتعلقة بنشاطاتها الخيرية، وسيتم الإعلان عن التفاصيل تباعًا."
-  },
-  activities:{
-    title:"نشاط ميداني خارج الولاية",
-    text:"قامت الجمعية بتنظيم نشاط تضامني خارج الولاية، شمل تقديم مساعدات غذائية ودعم اجتماعي للعائلات المحتاجة."
-  },
-  charity:{
-    title:"توزيع مساعدات خيرية",
-    text:"في إطار العمل الخيري، تم توزيع إعانات على عدد من الأسر المعوزة، سائلين الله القبول."
-  },
-  donation:{
-    title:"فتح باب التبرعات",
-    text:"تعلن الجمعية عن فتح باب التبرعات لدعم المشاريع الخيرية، ويمكن للمحسنين المساهمة حسب استطاعتهم."
-  },
-  ramadan:{
-    title:"انطلاق حملة قفة رمضان",
-    text:"استعدادًا لشهر رمضان المبارك، أطلقت الجمعية حملة قفة رمضان لفائدة العائلات المحتاجة."
-  }
+  news:[
+    {title:"إعلان هام للجمعية",text:"تعلم الجمعية الخيرية مسك الختام كافة المواطنين بآخر المستجدات المتعلقة بنشاطاتها الخيرية، وسيتم الإعلان عن التفاصيل تباعًا."},
+    {title:"بيان جديد",text:"سيتم تحديث برامج الجمعية للأيام القادمة مع مراعاة الإجراءات الاحترازية."}
+  ],
+  activities:[
+    {title:"نشاط ميداني خارج الولاية",text:"قامت الجمعية بتنظيم نشاط تضامني خارج الولاية، شمل تقديم مساعدات غذائية ودعم اجتماعي للعائلات المحتاجة."}
+  ],
+  charity:[
+    {title:"توزيع مساعدات خيرية",text:"في إطار العمل الخيري، تم توزيع إعانات على عدد من الأسر المعوزة، سائلين الله القبول."}
+  ],
+  donation:[
+    {title:"فتح باب التبرعات",text:"تعلن الجمعية عن فتح باب التبرعات لدعم المشاريع الخيرية، ويمكن للمحسنين المساهمة حسب استطاعتهم."}
+  ],
+  ramadan:[
+    {title:"انطلاق حملة قفة رمضان",text:"استعدادًا لشهر رمضان المبارك، أطلقت الجمعية حملة قفة رمضان لفائدة العائلات المحتاجة."}
+  ]
 };
 
-/* ===== عرض الخبر عند الضغط على أي قسم ===== */
-function showNews(type){
-  const box = document.getElementById("newsBox");
+/* ===== عرض الأخبار ===== */
+function showNews(section){
+  const container = document.getElementById("newsContainer");
+  container.innerHTML = ""; // تفريغ الأخبار السابقة
   const now = new Date();
   const date = now.toLocaleDateString("ar-DZ");
   const time = now.toLocaleTimeString("ar-DZ",{hour:'2-digit',minute:'2-digit'});
 
-  document.getElementById("newsTitle").innerText = newsData[type].title;
-  document.getElementById("newsMeta").innerText = `${date} - ${time}`;
-  document.getElementById("newsText").innerText = newsData[type].text;
-
-  box.style.display = "block";
-  box.scrollIntoView({behavior:"smooth"});
+  newsData[section].forEach(item=>{
+    const box = document.createElement("div");
+    box.className = "news-box";
+    box.innerHTML = `<div class="news-title">${item.title}</div>
+                     <div class="news-meta">${date} - ${time}</div>
+                     <div class="news-text">${item.text}</div>`;
+    container.appendChild(box);
+    box.style.display="flex";
+    box.scrollIntoView({behavior:"smooth"});
+  });
 }
 </script>
 
