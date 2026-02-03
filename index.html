@@ -31,12 +31,12 @@ body{
 
 .logo{width:80px;margin-bottom:6px;}
 
-/* 🔽 تم تقريب السطور هنا فقط */
+/* 🔽 عنوان الجمعية */
 .title{
   font-size:20px;
   font-weight:700;
   text-shadow:0 0 10px gold;
-  margin-bottom:2px;
+  margin-bottom:8px;
 }
 .date{
   margin:2px 0;
@@ -44,6 +44,32 @@ body{
   font-weight:700;
 }
 
+/* ===== زر الأخبار ===== */
+.newsButton{
+  display:inline-block;
+  padding:12px 20px;
+  font-size:16px;
+  font-weight:700;
+  color:white;
+  background-color:black;
+  border-radius:12px;
+  text-decoration:none;
+  box-shadow:0 0 10px gold;
+  animation:pulse 1.5s infinite;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-bottom:10px;
+}
+.newsButton:hover{
+  transform: scale(1.05);
+  box-shadow:0 0 20px gold;
+}
+@keyframes pulse{
+  0%{box-shadow:0 0 5px gold;}
+  50%{box-shadow:0 0 20px gold;}
+  100%{box-shadow:0 0 5px gold;}
+}
+
+/* ===== جدول الصلاة ===== */
 .table{margin-top:10px}
 .row{
   display:flex;
@@ -60,7 +86,7 @@ body{
 
 /* ===== العد التنازلي ===== */
 #countdownText{
-  font-size:24px;      /* ← حجم جملة: العصر بعد */
+  font-size:24px;
   font-weight:700;
   margin:6px 0;
   color:gold;
@@ -82,31 +108,6 @@ body{
   height:35px;
 }
 
-/* ===== شريط الأخبار ===== */
-#newsTicker{
-  width:100%;
-  overflow:hidden;
-  white-space:nowrap;
-  border-radius:8px;
-  margin:5px 0 10px 0;
-  background:rgba(255,215,0,0.1);
-  padding:5px 0;
-  font-weight:700;
-  font-size:16px;
-  position:relative;
-  color:gold;
-}
-#newsTicker span{
-  display:inline-block;
-  position:relative;
-  left:-100%;
-  animation:scrollLeft 20s linear infinite;
-}
-@keyframes scrollLeft{
-  0%{left:-100%;}
-  100%{left:100%;}
-}
-
 .footer{
   margin-top:10px;
   font-size:14px;
@@ -123,11 +124,8 @@ body{
 
   <img src="logo.png" class="logo" alt="لوغو الجمعية">
 
-  <div id="newsTicker">
-    <span>
-🌙تذكير بصيام أيام البيض التي تبدأ من يوم غد الاحد 01 فيفري الى غاية يوم الثلاثاء 03 فيفري 2026🌙الجمعية الخيرية مسك الختام القرارم قوقة
-    </span>
-  </div>
+  <!-- زر آخر الأخبار -->
+  <a href="news-main.html" class="newsButton">آخر أخبار مسك الختام</a>
 
   <div class="title">الجمعية الخيرية مسك الختام القرارم قوقة</div>
 
