@@ -12,29 +12,30 @@
 body{background:#000;color:#fff;min-height:100vh;}
 a{text-decoration:none;color:inherit;}
 
-/* ===== الهيدر ===== */
+/* ===== الهيدر المحسن ===== */
 .header{
   position: relative;
   display:flex;
   justify-content:space-between;
   align-items:center;
   padding:20px;
-  min-height:120px;
+  min-height:150px;
+  background:linear-gradient(90deg, #000 0%, rgba(255,215,0,0.05) 100%);
   border-bottom:2px solid gold;
+  flex-wrap:wrap;
 }
 .header-left{
-  width:80px; /* مكان اللوغو */
-  height:80px;
-  background:#111;
-  border:1px solid gold;
+  flex:0 0 100px;
+}
+.header-left img{
+  width:100px;
+  height:auto;
+  object-fit:contain;
   border-radius:12px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  color:#888;
-  font-size:12px;
+  border:1px solid gold;
 }
 .header-right{
+  flex:1;
   text-align:right;
 }
 .header-right .main-title{
@@ -94,8 +95,7 @@ a{text-decoration:none;color:inherit;}
 
 <div class="header">
   <div class="header-left">
-    <!-- مكان اللوغو -->
-    لوغو
+    <img src="logo1.png" alt="لوغو الجمعية">
   </div>
   <div class="header-right">
     <div class="main-title">
