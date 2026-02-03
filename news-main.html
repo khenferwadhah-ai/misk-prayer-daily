@@ -14,87 +14,45 @@ a{text-decoration:none;color:inherit;}
 
 /* ===== الهيدر ===== */
 .header{
-  position: relative;
-  display:flex;
-  flex-direction:column;
-  padding:15px;
-  background:#000;
+  text-align:center;
+  padding:25px 15px;
   border-bottom:2px solid gold;
 }
-.header-top{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-}
-.header-left{
-  text-align:left;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-  align-items:flex-start;
-  gap:4px;
-  position:relative;
-}
-.header-left .main-title{
-  color:#fff;
+.header h1{
+  font-size:30px;
   font-weight:900;
-  font-size:26px;
-  line-height:1.1;
-  position:relative;
-  padding-left:10px;
-}
-.header-left .main-title span{display:block;}
-.header-left .subtitle-small{
-  color:#fff;
-  font-size:12px;
-  position:relative;
-  padding-left:10px;
-}
-.header-left::after{
-  content:"";
-  position:absolute;
-  top:0;
-  left:100%;
-  width:2px;
-  height:100%;
-  background:#fff;
-  margin-left:8px;
-}
-.header-right img{
-  width:80px;
-  height:auto;
-  object-fit:contain;
-}
-.header-bottom{
-  text-align:center;
   color:gold;
-  font-size:10px;
-  font-weight:700;
-  margin-top:10px;
+  margin-bottom:8px;
+}
+.logo-holder{
+  font-size:14px;
+  opacity:0.6;
+  margin-bottom:10px;
 }
 
-/* ===== أقسام الأخبار مصغرة في سطر واحد ===== */
+/* ===== أقسام الأخبار ===== */
 .sections{
   display:flex;
-  justify-content:flex-start;
-  flex-wrap:nowrap;
-  gap:6px;
-  padding:10px 15px;
-  overflow-x:auto;
+  flex-wrap:wrap;
+  gap:10px;
+  justify-content:center;
+  padding:15px;
 }
 .section-btn{
   background:#111;
   border:2px solid gold;
   color:#fff;
-  padding:8px 10px;
-  font-size:12px;
+  padding:14px 12px;
+  font-size:15px;
   font-weight:700;
-  border-radius:6px;
+  border-radius:10px;
   cursor:pointer;
-  flex-shrink:0;
   transition:0.3s;
 }
-.section-btn:hover{background:gold;color:#000;}
+.section-btn:hover{
+  background:gold;
+  color:#000;
+}
 
 /* ===== عرض الأخبار ===== */
 .news-container{
@@ -112,36 +70,31 @@ a{text-decoration:none;color:inherit;}
   flex-direction:column;
   gap:8px;
 }
-.news-title{font-size:22px;font-weight:900;color:gold;}
-.news-meta{font-size:13px;opacity:0.8;}
-.news-text{font-size:17px;line-height:1.8;}
+.news-title{
+  font-size:22px;
+  font-weight:900;
+  color:gold;
+}
+.news-meta{
+  font-size:13px;
+  opacity:0.8;
+}
+.news-text{
+  font-size:17px;
+  line-height:1.8;
+}
 
-/* ===== التوافق مع الشاشات الصغيرة ===== */
 @media(max-width:400px){
-  .header-left .main-title{font-size:20px;}
-  .header-left .subtitle-small{font-size:10px;}
   .news-title{font-size:20px;}
   .news-text{font-size:16px;}
-  .header-right img{width:60px;}
 }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="header-top">
-    <div class="header-left">
-      <div class="main-title">
-        <span>أخبار</span>
-        <span>مسك الختام</span>
-      </div>
-      <div class="subtitle-small">MISK-ELKHITHEM</div>
-    </div>
-    <div class="header-right">
-      <img src="logo1.png" alt="لوغو الجمعية">
-    </div>
-  </div>
-  <div class="header-bottom">الجمعية الخيرية مسك الختام القرارم قوقة</div>
+  <h1>أخبار مسك الختام</h1>
+  <div class="logo-holder">مكان إضافة لوغو الجمعية لاحقًا</div>
 </div>
 
 <div class="sections">
