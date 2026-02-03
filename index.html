@@ -8,15 +8,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',Tahoma;}
-body{
+/* ===== إعدادات عامة ===== */
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Cairo',Tahoma; }
+
+body {
   min-height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
   background:url("background1.png") center/cover no-repeat fixed;
 }
-.overlay{
+
+.overlay {
   width:95%;
   max-width:420px;
   padding:15px;
@@ -25,8 +28,12 @@ body{
   color:#fff;
   transform:scale(0.92);
 }
-.logo{width:80px;margin-bottom:8px;}
-.newsButton{
+
+/* ===== شعار الجمعية ===== */
+.logo { width:80px; margin-bottom:8px; }
+
+/* ===== زر الأخبار ===== */
+.newsButton {
   display:block;
   width:100%;
   padding:14px 0;
@@ -42,16 +49,23 @@ body{
   transition:0.3s;
   cursor:pointer;
 }
-.newsButton:hover{background:gold;color:#000;}
-@keyframes pulse{
-  0%{box-shadow:0 0 6px gold;}
-  50%{box-shadow:0 0 24px gold;}
-  100%{box-shadow:0 0 6px gold;}
+
+.newsButton:hover { background:gold; color:#000; }
+
+@keyframes pulse {
+  0% { box-shadow:0 0 6px gold; }
+  50% { box-shadow:0 0 24px gold; }
+  100% { box-shadow:0 0 6px gold; }
 }
-.title{font-size:20px;font-weight:700;margin-bottom:6px;text-shadow:0 0 10px gold;}
-.date{font-size:14px;font-weight:700;margin:2px 0;}
-#countdownText{margin:8px 0;font-size:24px;font-weight:700;color:gold;}
-.clockBox{
+
+/* ===== العنوان والتاريخ ===== */
+.title { font-size:20px; font-weight:700; margin-bottom:6px; text-shadow:0 0 10px gold; }
+.date { font-size:14px; font-weight:700; margin:2px 0; }
+
+/* ===== العد التنازلي ===== */
+#countdownText { margin:8px 0; font-size:24px; font-weight:700; color:gold; }
+
+.clockBox {
   display:flex;
   align-items:center;
   justify-content:center;
@@ -61,78 +75,95 @@ body{
   border-radius:12px;
   box-shadow:0 0 15px gold;
 }
-.clockBox img{width:34px;}
-#nextPrayerClock{font-size:30px;}
-.table{margin-top:12px;}
-.row{
+.clockBox img { width:34px; }
+#nextPrayerClock { font-size:30px; }
+
+/* ===== جدول الصلاة ===== */
+.table { margin-top:12px; }
+.row {
   display:flex;
   justify-content:space-between;
   padding:6px 8px;
   font-weight:700;
   border-bottom:1px solid rgba(255,255,255,.3);
 }
-.row.next{background:gold;color:#000;border-radius:10px;}
-.footer{margin-top:10px;font-size:14px;}
+.row.next { background:gold; color:#000; border-radius:10px; }
+
+/* ===== التذييل ===== */
+.footer { margin-top:10px; font-size:14px; }
 </style>
 </head>
 <body>
 
 <div class="overlay">
+
+  <!-- شعار الجمعية -->
   <img src="logo.png" class="logo" alt="لوغو الجمعية">
 
   <!-- زر الأخبار -->
   <a href="news-main.html" class="newsButton">آخر أخبار مسك الختام</a>
 
+  <!-- العنوان -->
   <div class="title">الجمعية الخيرية مسك الختام القرارم قوقة</div>
+
+  <!-- التاريخ -->
   <div class="date" id="gregorian">--</div>
   <div class="date" id="hijri">--</div>
 
+  <!-- العد التنازلي للصلاة القادمة -->
   <div id="countdownText">-- بعد:</div>
   <div class="clockBox">
     <img src="logo.webp" alt="تنبيه">
     <div id="nextPrayerClock">--:--:--</div>
   </div>
 
+  <!-- جدول مواعيد الصلاة -->
   <div class="table" id="prayerTable"></div>
+
+  <!-- التذييل -->
   <div class="footer">misk elkhithem ©</div>
 </div>
 
 <script>
+/* ===== بيانات الصلاة ===== */
 const prayers = ["الفجر","الإمساك","الظهر","العصر","المغرب","العشاء"];
 const times  = ["06:09","05:59","12:49","15:40","18:04","19:25"];
-let rows=[];
+let rows = [];
 
-const table=document.getElementById("prayerTable");
+/* ===== إنشاء جدول الصلاة ===== */
+const table = document.getElementById("prayerTable");
 prayers.forEach((p,i)=>{
-  const r=document.createElement("div");
-  r.className="row";
-  r.innerHTML=`<span>${p}</span><span id="t${i}">${times[i]}</span>`;
+  const r = document.createElement("div");
+  r.className = "row";
+  r.innerHTML = `<span>${p}</span><span id="t${i}">${times[i]}</span>`;
   table.appendChild(r);
   rows.push(r);
 });
 
+/* ===== عرض التاريخ ===== */
 function updateDate(){
-  const now=new Date();
-  document.getElementById("gregorian").innerText=
-    now.toLocaleDateString("ar-DZ",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  const now = new Date();
+  document.getElementById("gregorian").innerText =
+    now.toLocaleDateString("ar-DZ",{ weekday:"long", day:"numeric", month:"long", year:"numeric" });
 }
 updateDate();
 
+/* ===== العد التنازلي للصلاة القادمة ===== */
 function countdown(){
-  const now=new Date();
-  rows.forEach(r=>r.classList.remove("next"));
+  const now = new Date();
+  rows.forEach(r => r.classList.remove("next"));
 
-  for(let i=0;i<times.length;i++){
-    if(i===1) continue;
-    const [h,m]=times[i].split(":");
-    const t=new Date();
+  for(let i=0; i<times.length; i++){
+    if(i===1) continue; // تجاهل الإمساك
+    const [h,m] = times[i].split(":").map(Number);
+    const t = new Date();
     t.setHours(h,m,0,0);
 
     if(t>now){
       rows[i].classList.add("next");
-      document.getElementById("countdownText").innerText=prayers[i]+" بعد:";
-      const d=t-now;
-      document.getElementById("nextPrayerClock").innerText=
+      document.getElementById("countdownText").innerText = prayers[i]+" بعد:";
+      const d = t - now;
+      document.getElementById("nextPrayerClock").innerText =
         `${String(Math.floor(d/3600000)).padStart(2,"0")}:`+
         `${String(Math.floor(d%3600000/60000)).padStart(2,"0")}:`+
         `${String(Math.floor(d%60000/1000)).padStart(2,"0")}`;
